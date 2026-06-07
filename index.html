@@ -196,6 +196,7 @@
                 bgm.play().then(() => {
                     isPlaying = true;
                     musicBtn.innerText = "⏸ 暂停声音";
+                    bgm.playbackRate = 0.85;
                 }).catch(err => {
                     console.log("播放失败，需要用户交互:", err);
                 });
