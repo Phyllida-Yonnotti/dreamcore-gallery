@@ -123,7 +123,9 @@
     </style>
 </head>
 <body>
-
+    
+    <audio id="bgm" src="images/bgm.mp3" loop></audio>
+    
     <div class="dream-text">
         你记得这里吗？<br>
         [ 或者是你迷失的那天 ]
@@ -142,6 +144,7 @@
             
             <div class="nav-buttons">
                 <button class="btn" onclick="changeMemory(-1)">◀ 上一段</button>
+                <button class="btn" id="musicBtn" onclick="toggleMusic()">🎵 播放声音</button>
                 <button class="btn" onclick="changeMemory(1)">下一段 ▶</button>
             </div>
         </div>
@@ -181,6 +184,26 @@
                 captionElement.innerText = memories[currentIndex].text;
                 imgElement.style.opacity = 1;
             }, 150);
+        }
+
+        // music player
+        let isPlaying = false;
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('musicBtn');
+        
+        function toggleMusic() {
+            if (!isPlaying) {
+                bgm.play().then(() => {
+                    isPlaying = true;
+                    musicBtn.innerText = "⏸ 暂停声音";
+                }).catch(err => {
+                    console.log("播放失败，需要用户交互:", err);
+                });
+            } else {
+                bgm.pause();
+                isPlaying = false;
+                musicBtn.innerText = "🎵 播放声音";
+            }
         }
     </script>
 </body>
