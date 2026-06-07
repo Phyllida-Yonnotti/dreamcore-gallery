@@ -1,219 +1,30 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-  </style>
+    <meta charset="UTF-8">
+    <title>Is this a dream?</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ffcc;
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .box {
+            border: 3px double #00ffcc;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="zh-CN"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;Is this a dream?&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 全局样式：深邃、虚无的黑色背景 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: #000000;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: #00ffcc; /* 经典的复古荧光绿/青色 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-family: "Courier New", Courier, monospace; /* 纯文本等宽字体 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 20px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>flex-direction: column;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>justify-content: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>min-height: 100vh;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>overflow-x: hidden;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>/* 背景隐约的扫描线效果，增加复古大头贴/老电视感 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-size: 100% 4px, 6px 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 意识流的标题文字 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.dream-text {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 1.2rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>text-align: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-bottom: 30px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>letter-spacing: 2px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>text-shadow: 0 0 8px #00ffcc;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>animation: blink 2s infinite;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 仿 Win95/旧版电脑弹窗的容器 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.window-container {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background-color: #c0c0c0; /* 经典的灰白系统色 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border: 3px solid;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-color: #fff #808080 #808080 #fff; /* 伪3D边框 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 90%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>max-width: 500px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 3px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-shadow: 10px 10px 0px rgba(0, 255, 204, 0.3);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 弹窗标题栏 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.window-header {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: linear-gradient(90deg, #000080, #1084d0); /* 经典Windows蓝 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 4px 8px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-weight: bold;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 0.9rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>justify-content: space-between;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.window-close {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #c0c0c0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border: 1px solid;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-color: #fff #404040 #404040 #fff;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 0px 6px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>cursor: pointer;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 0.8rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 照片展示区域 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.window-body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 15px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #5a5a5a; /* 内部深色背景，衬托照片 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>flex-direction: column;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.photo-frame {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #000;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border: 2px inset #fff;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>text-align: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 照片样式：添加轻微糊化和过曝感滤镜 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.photo-frame img {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>height: auto;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: block;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>filter: contrast(1.2) saturate(0.8) blur(0.3px);<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>transition: all 0.5s ease;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 鼠标悬停在照片上时产生怪异的扭曲/明亮效果 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.photo-frame img:hover {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>filter: contrast(2) invert(0.1) hue-rotate(90deg);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 照片下方的说明文字 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.photo-caption {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: #ff00ff; /* 霓虹粉 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-top: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 0.85rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>text-shadow: 0 0 5px #ff00ff;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 控制按钮 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.nav-buttons {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin-top: 15px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>gap: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.btn {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #c0c0c0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border: 2px solid;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-color: #fff #404040 #404040 #fff;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 5px 15px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-family: inherit;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>cursor: pointer;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-weight: bold;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.btn:active {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-color: #404040 #fff #fff #404040;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>/* 闪烁动画 */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>@keyframes blink {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>0%, 100% { opacity: 1; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>50% { opacity: 0.6; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="dream-text"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>你记得这里吗？&lt;br&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>[ 或者是你迷失的那天 ]</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- 核心展示弹窗 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="window-container"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="window-header"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;span&gt;Memory_Viewer.exe&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button class="window-close" onclick="alert('你无法逃离这里。')"&gt;X&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="window-body"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="photo-frame"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;!-- 替换下面的 src 为你自己的照片路径 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;!-- 这里先用占位图代替，建议换成你拍的：空旷的走廊、过曝的天空、黄昏的游乐场等 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;img id="gallery" src="https://picsum.photos/id/1062/500/350" alt="dreamcore"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div class="photo-caption" id="caption"&gt;这是你醒来前看到的最后一幕。&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="nav-buttons"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button class="btn" onclick="changeMemory(-1)"&gt;◀ 上一段&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;button class="btn" onclick="changeMemory(1)"&gt;下一段 ▶&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// 在这里配置你的照片路径和对应的怪异文字</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const memories = [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>url: “images/pic1.jpg",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>text: "这是你醒来前看到的最后一幕。"</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>url: "images/pic2.jpg",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>text: "谁在有雾的午后等过你？"</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>url: "images/pic3.jpg",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>text: "没有人的地方，才是最安全的。"</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>];</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let currentIndex = 0;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function changeMemory(direction) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>currentIndex += direction;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (currentIndex &gt;= memories.length) currentIndex = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (currentIndex &lt; 0) currentIndex = memories.length - 1;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const imgElement = document.getElementById('gallery');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const captionElement = document.getElementById('caption');</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// 切换图片时的微小闪烁效果</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>imgElement.style.opacity = 0.3;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>imgElement.src = memories[currentIndex].url;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>captionElement.innerText = memories[currentIndex].text;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>imgElement.style.opacity = 1;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}, 150);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+    <div class="box">
+        <h1>欢迎来到梦境</h1>
+        <p>如果能看到这个框，说明你的网站彻底成功了。</p>
+    </div>
 </body>
 </html>
