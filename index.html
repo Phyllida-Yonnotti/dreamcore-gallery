@@ -160,28 +160,35 @@
   </div>
 
   <script>
+    /// read pics
     let memories = [];
 
-    let currentIndex = 0;
-
-    const imgElement = document.getElementById('gallery');
-    const captionElement = document.getElementById('caption');
-
     fetch('data.json')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) throw new Error("无法读取账本");
+        return response.json();
+      })
       .then(data => {
-        memories = data;
+        memories = data; // 拿到完整的照片和文案数组
+
+        // 如果账本里有数据，渲染第一张图到页面上
         if (memories.length > 0) {
-          imgElement.src = memories[0].url;
-          captionElement.innerText = memories[0].text;
+          // 假设你的图片标签 id 是展示用的展示框
+          const imgElement = document.getElementById('gallery-image');
+          const captionElement = document.getElementById('gallery-caption');
+
+          if (imgElement) imgElement.src = memories[0].url;
+          if (captionElement) captionElement.innerText = memories[0].text;
+
+          // 💡 如果你以前的代码有记录上传者，你甚至可以利用 item.by 把它显示出来
+          console.log(`这张图是由 ${memories[0].by || '神秘人'} 载入的`);
         }
       })
       .catch(err => {
-        console.error("读取记忆矩阵失败:", err);
-        captionElement.innerText = "[ 无法加载记忆碎片 ]";
+        console.error("加载失败: ", err);
       });
 
-    // slide images
+    /// slide images
     function changeMemory(direction) {
       if (memories.length === 0) return;
 
