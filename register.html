@@ -2,23 +2,21 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>SYSTEM LOGIN</title>
+    <title>SYSTEM REGISTER</title>
     <style>
+        /* 复用登录页面的复古样式 */
         body { background-color: #008080; font-family: 'Courier New', monospace; padding: 20px; color: #000; margin: 0; }
-        /* 汉堡菜单通用样式 */
         .navbar { position: absolute; top: 10px; right: 10px; z-index: 999; }
         .hamburger-btn { background-color: #c0c0c0; border: 2px solid #fff; border-right-color: #555; border-bottom-color: #555; padding: 4px 8px; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
         .menu-dropdown { display: none; position: absolute; right: 0; top: 32px; background-color: #c0c0c0; border: 2px solid #fff; border-right-color: #555; border-bottom-color: #555; width: 120px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
         .menu-dropdown a { display: block; padding: 6px 12px; color: black; text-decoration: none; font-size: 0.85rem; }
         .menu-dropdown a:hover { background-color: #000080; color: white; }
-        
         .window { width: 360px; background-color: #c0c0c0; border: 2px solid #fff; border-right-color: #808080; border-bottom-color: #808080; margin: 100px auto 0 auto; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
         .title-bar { background: linear-gradient(90deg, #000080, #1084d0); color: white; padding: 4px; font-weight: bold; font-size: 0.9rem; }
         .window-body { padding: 15px; }
         .section-box { border: 2px inset #fff; padding: 10px; margin-bottom: 15px; background-color: #d8d8d8; }
         .label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; }
         .btn { background-color: #c0c0c0; border: 2px solid #fff; border-right-color: #555; border-bottom-color: #555; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; }
-        .btn:active { border: 2px inset #fff; }
         .btn-block { width: 100%; padding: 6px; font-weight: bold; margin-top: 10px; }
         input { width: 93%; border: 2px inset #fff; padding: 4px; font-family: inherit; margin-bottom: 10px; }
         #status-area { margin-top: 10px; font-size: 0.8rem; text-align: center; }
@@ -36,23 +34,19 @@
 
 <div class="window">
     <div class="title-bar">
-        <span class="title-bar-text">🔑 SYSTEM_LOGIN.EXE - 身份认证</span>
+        <span class="title-bar-text">🆕 REGISTER.EXE - 申请加入矩阵</span>
     </div>
     <div class="window-body">
         <div class="section-box">
-            <label class="label">👤 管理员标识 (Username)</label>
-            <input type="text" id="login-username" placeholder="输入用户名">
+            <label class="label">👤 设定新管理员标识 (Username)</label>
+            <input type="text" id="reg-username" placeholder="想一个用户名">
             
-            <label class="label">🔑 矩阵效验暗号 (Password)</label>
-            <input type="password" id="login-password" placeholder="输入密码">
+            <label class="label">🔑 设定矩阵安全效验暗号 (Password)</label>
+            <input type="password" id="reg-password" placeholder="设一个密码">
             
-            <button class="btn btn-block" onclick="loginAndRedirect()">🔓 登录系统</button>
+            <button class="btn btn-block" onclick="registerAccount()">✍️ 递交注册申请</button>
         </div>
-        
-        <div style="text-align: center; margin-top: 15px;">
-            <span style="font-size:0.8rem;">没有账号？</span>
-            <button class="btn" style="font-size:0.75rem; padding:2px 6px;" onclick="window.location.href='register.html'">🆕 前往注册页面</button>
-        </div>
+        <div style="text-align: center;"><a href="admin.html" style="font-size:0.8rem; color:#000;">已有账号？返回登录</a></div>
         <div id="status-area"></div>
     </div>
 </div>
@@ -63,39 +57,32 @@
         menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
 
-    async function loginAndRedirect() {
-        const username = document.getElementById('login-username').value;
-        const password = document.getElementById('login-password').value;
+    async function registerAccount() {
+        const username = document.getElementById('reg-username').value;
+        const password = document.getElementById('reg-password').value;
         const status = document.getElementById('status-area');
 
-        if (!username || !password) { status.innerText = "❌ 请填写完整的账号密码！"; return; }
-        status.innerText = "⚡ 正在核对身份...";
+        if (!username || !password) { status.innerText = "❌ 账号和密码不能为空！"; return; }
+        status.style.color = "black";
+        status.innerText = "⚡ 正在向 Supabase 申请空位...";
 
         try {
-            // 💡 借用 upload 路由，但只传空内容去测密码。如果成功，就把账号密码暂存进浏览器
             const response = await fetch('/api/upload', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'upload', username, password, caption: 'test', fileName: 'test.jpg', fileContent: 'test' })
+                body: JSON.stringify({ action: 'register', username, password })
             });
-            
             const result = await response.json();
-            
-            // 因为我们传了错误的图片格式，所以只要返回不是 401（密码错），就说明密码是对的
-            if (response.status !== 401) {
-                // 记住登录凭证，传给上传页面用
-                sessionStorage.setItem('dc_user', username);
-                sessionStorage.setItem('dc_pwd', password);
-                
+            if (response.ok && result.success) {
                 status.style.color = "green";
-                status.innerText = "🎉 欢迎回来，正在接入控制台...";
-                setTimeout(() => { window.location.href = 'upload.html'; }, 1000);
+                status.innerText = `🎉 注册成功！1秒后自动前往登录大门...`;
+                setTimeout(() => { window.location.href = 'admin.html'; }, 1200);
             } else {
-                throw new Error(result.error || "暗号错误");
+                throw new Error(result.error || "注册失败");
             }
         } catch (error) {
             status.style.color = "red";
-            status.innerText = `❌ 拒绝访问: ${error.message}`;
+            status.innerText = `❌ 注册终止: ${error.message}`;
         }
     }
 </script>
