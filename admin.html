@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM_ADMIN.EXE - 记忆矩阵管理后台</title>
+    <style>
+        body {
+            background-color: #008080;
+            /* 经典的 Win95 绿屏背景 */
+            color: #000;
+            font-family: "MS Sans Serif", "Courier New", monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .window {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #fff #404040 #404040 #fff;
+            width: 100%;
+            max-width: 500px;
+            padding: 2px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            color: #fff;
+            padding: 4px 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-bar-text {
+            letter-spacing: 1px;
+        }
+
+        .window-body {
+            padding: 15px;
+        }
+
+        .section-box {
+            border: 2px inset #fff;
+            background-color: #e0e0e0;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .label {
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+            display: block;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 4px;
+            border: 2px inset #fff;
+            background-color: #fff;
+            font-family: inherit;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        /* 隐藏原生文件上传按钮，用复古按钮代替 */
+        .file-input-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #fff #404040 #404040 #fff;
+            padding: 6px 12px;
+            font-family: inherit;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:active {
+            border-color: #404040 #fff #fff #404040;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+            background-color: #bfbfff;
+        }
+
+        #status-area {
+            font-size: 0.8rem;
+            color: #ff0000;
+            margin-top: 10px;
+            min-height: 1.2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="window">
+        <div class="title-bar">
+            <span class="title-bar-text">🔒 SYSTEM_LOCK.EXE - 管理员认证</span>
+        </div>
+        <div class="window-body">
+            <div class="section-box">
+                <label class="label">🔑 输入管理员密码</label>
+                <input type="password" id="admin-password"
+                    style="width:100%; padding:4px; border:2px inset #fff; margin-bottom:10px;"
+                    placeholder="请输入网络控制台密码">
+            </div>
+
+            <div class="section-box">
+                <label class="label">1. 选择并载入新的记忆切片 (照片)</label>
+                <div class="file-input-container" style="position:relative; margin-bottom:10px;">
+                    <button class="btn" type="button" id="file-label">📂 选择图片文件...</button>
+                    <input type="file" id="image-file" accept="image/*" onchange="updateFileLabel(this)"
+                        style="position:absolute; left:0; top:0; opacity:0; width:100%; height:100%; cursor:pointer;">
+                </div>
+
+                <label class="label">2. 植入潜意识关联文字 (文案)</label>
+                <textarea id="caption-text" rows="3" placeholder="例如：谁在有雾的午后等过你？"></textarea>
+            </div>
+
+            <button class="btn btn-block" onclick="uploadMemory()">💾 验证身份并写入核心矩阵</button>
+            <div id="status-area">状态: 🟢 等待认证。</div>
+        </div>
+    </div>
+
+    <script>
+        function updateFileLabel(input) {
+            const label = document.getElementById('file-label');
+            label.innerText = input.files.length > 0 ? `📄 已载入: ${input.files[0].name}` : `📂 选择图片文件...`;
+        }
+
+        async function uploadMemory() {
+            const password = document.getElementById('admin-password').value;
+            const fileInput = document.getElementById('image-file');
+            const caption = document.getElementById('caption-text').value;
+            const status = document.getElementById('status-area');
+
+            if (!password) { status.innerText = "❌ 错误: 密码不能为空！"; return; }
+            if (fileInput.files.length === 0) { status.innerText = "❌ 错误: 请选择图片！"; return; }
+            if (!caption) { status.innerText = "❌ 错误: 请填写文案！"; return; }
+
+            status.innerText = "🚀 正在向云端提交身份认证...";
+            const file = fileInput.files[0];
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file); // 读取为 base64 字符串
+            reader.onload = async function () {
+                try {
+                    // 提取纯 base64 数据部分
+                    const base64Content = reader.result.split(',')[1];
+
+                    // 💡 直接向我们刚刚写好的本地 api/upload 后端发起请求
+                    const response = await fetch('/api/upload', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            password: password,
+                            caption: caption,
+                            fileName: file.name,
+                            fileContent: base64Content
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        status.style.color = "green";
+                        status.innerText = "🎉 密码正确，矩阵重编成功！10秒后网站自动更新。";
+                        fileInput.value = "";
+                        document.getElementById('caption-text').value = "";
+                        document.getElementById('file-label').innerText = `📂 选择图片文件...`;
+                    } else {
+                        throw new Error(result.error || "认证失败");
+                    }
+                } catch (error) {
+                    status.style.color = "red";
+                    status.innerText = `❌ 拒绝访问: ${error.message}`;
+                }
+            };
+        }
+    </script>
+</body>
+
+</html>
