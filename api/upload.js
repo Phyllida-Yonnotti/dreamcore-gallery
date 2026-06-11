@@ -2,7 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 // 1. 初始化 Supabase 客户端（Vercel 已经自动帮你配好了这两个环境变量）
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 // 2. 核心安全辅助：将明文密码转化为不可逆的 SHA-256 哈希值
 async function hashPassword(password) {
