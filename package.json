@@ -1,0 +1,10 @@
+{
+  "name": "dreamcore-gallery",
+  "version": "1.0.0",
+  "description": "Dreamcore Gallery Admin System",
+  "main": "api/upload.js",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.0"
+  }
+}
