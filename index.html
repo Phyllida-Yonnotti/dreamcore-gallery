@@ -128,10 +128,95 @@
         opacity: 0.6;
       }
     }
+
+    /* 🟢 开场全屏遮罩样式 */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 99999;
+      /* 保证遮罩层在最最最上层 */
+      background-color: #050508;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      /* 淡出过渡效果：1秒内完成淡出 */
+      transition: opacity 1s ease-out, visibility 1s ease-out;
+    }
+
+    /* 开场图片：铺满全屏，按比例裁剪 */
+    .splash-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* 保证图片不变形且充满全屏 */
+      filter: brightness(0.6);
+      /* 稍微调暗一点，显出高级感 */
+      animation: zoomEffect 3s ease-out forwards;
+      /* 图片缓慢放大的微动效 */
+    }
+
+    /* 覆盖在图片上的文字提示 */
+    .splash-title {
+      position: relative;
+      z-index: 2;
+      color: #63e6be;
+      font-family: 'Courier New', monospace;
+      font-size: 1.2rem;
+      letter-spacing: 4px;
+      text-shadow: 0 0 15px rgba(99, 230, 190, 0.8);
+      animation: pulseText 2s infinite ease-in-out;
+    }
+
+    /* 淡出时的触发类 */
+    #splash-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      /* 防止淡出后挡住点击事件 */
+    }
+
+    /* 微动效：镜头慢慢推进 */
+    @keyframes zoomEffect {
+      from {
+        transform: scale(1);
+      }
+
+      to {
+        transform: scale(1.08);
+      }
+    }
+
+    @keyframes pulseText {
+
+      0%,
+      100% {
+        opacity: 0.4;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 
 <body>
+
+  <!-- 🟢 开场全屏大图遮罩层 -->
+  <div id="splash-screen">
+    <!-- 替换下面 src 的图片链接为你想要的开场大图，例如你的艺术图或梦境图 -->
+    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1920&q=80" alt="Intro"
+      class="splash-img">
+    <div class="splash-title">// ENTERING THE DREAMSCAPE //</div>
+  </div>
 
   <audio id="bgm" src="music/lofi/0001.m4a" loop></audio>
 
@@ -225,6 +310,16 @@
         musicBtn.innerText = "🎵 播放声音";
       }
     }
+
+    // 🟢 开场遮罩自动淡出逻辑
+    window.addEventListener('DOMContentLoaded', () => {
+      const splash = document.getElementById('splash-screen');
+
+      // 页面加载完成后，等待 2 秒（2000毫秒），然后开始淡出
+      setTimeout(() => {
+        splash.classList.add('fade-out');
+      }, 2000);
+    });
   </script>
 </body>
 

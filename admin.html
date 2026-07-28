@@ -2,26 +2,139 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>SYSTEM LOGIN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM ACCESS</title>
     <style>
-        body { background-color: #008080; font-family: 'Courier New', monospace; padding: 20px; color: #000; margin: 0; }
-        /* 汉堡菜单通用样式 */
-        .navbar { position: absolute; top: 10px; right: 10px; z-index: 999; }
-        .hamburger-btn { background-color: #c0c0c0; border: 2px solid #fff; border-right-color: #555; border-bottom-color: #555; padding: 4px 8px; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
-        .menu-dropdown { display: none; position: absolute; right: 0; top: 32px; background-color: #c0c0c0; border: 2px solid #fff; border-right-color: #555; border-bottom-color: #555; width: 120px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
-        .menu-dropdown a { display: block; padding: 6px 12px; color: black; text-decoration: none; font-size: 0.85rem; }
-        .menu-dropdown a:hover { background-color: #000080; color: white; }
+        body { 
+            background: linear-gradient(135deg, #0f0a1c 0%, #071210 50%, #050508 100%);
+            font-family: 'Courier New', monospace; 
+            margin: 0; 
+            padding: 20px; 
+            color: #d0d7d5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 230, 190, 0.08) 0%, rgba(141, 49, 255, 0.05) 70%, transparent 100%);
+            top: 25%;
+            left: 30%;
+            z-index: 0;
+            filter: blur(40px);
+            animation: floatGlow 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 20px) scale(1.2); }
+        }
         
-        .window { width: 360px; background-color: #c0c0c0; border: 2px solid #fff; border-right-color: #808080; border-bottom-color: #808080; margin: 100px auto 0 auto; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .title-bar { background: linear-gradient(90deg, #000080, #1084d0); color: white; padding: 4px; font-weight: bold; font-size: 0.9rem; }
-        .window-body { padding: 15px; }
-        .section-box { border: 2px inset #fff; padding: 10px; margin-bottom: 15px; background-color: #d8d8d8; }
-        .label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; }
-        .btn { background-color: #c0c0c0; border: 2px solid #fff; border-right-color: #555; border-bottom-color: #555; padding: 4px 12px; cursor: pointer; font-size: 0.85rem; }
-        .btn:active { border: 2px inset #fff; }
-        .btn-block { width: 100%; padding: 6px; font-weight: bold; margin-top: 10px; }
-        input { width: 93%; border: 2px inset #fff; padding: 4px; font-family: inherit; margin-bottom: 10px; }
-        #status-area { margin-top: 10px; font-size: 0.8rem; text-align: center; }
+        .navbar { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .hamburger-btn { 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(99, 230, 190, 0.2); 
+            color: #63e6be; 
+            padding: 8px 14px; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            backdrop-filter: blur(8px);
+            border-radius: 4px;
+            text-shadow: 0 0 8px rgba(99, 230, 190, 0.5);
+            transition: all 0.3s;
+        }
+        .hamburger-btn:hover { 
+            background: rgba(99, 230, 190, 0.1); 
+            box-shadow: 0 0 15px rgba(99, 230, 190, 0.2);
+        }
+        .menu-dropdown { 
+            display: none; 
+            position: absolute; 
+            right: 0; 
+            top: 45px; 
+            background: rgba(10, 8, 16, 0.95); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            width: 150px; 
+            backdrop-filter: blur(15px);
+            border-radius: 6px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+        }
+        .menu-dropdown a { display: block; padding: 12px 16px; color: #999; text-decoration: none; font-size: 0.85rem; transition: all 0.3s; }
+        .menu-dropdown a:hover { color: #63e6be; background: rgba(99, 230, 190, 0.05); text-shadow: 0 0 5px rgba(99, 230, 190, 0.3); }
+        
+        .auth-container { 
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 350px; 
+            background: rgba(15, 15, 25, 0.95); 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            padding: 40px 30px;
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+        
+        .panel-title { 
+            font-size: 0.95rem; 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            margin-bottom: 35px; 
+            color: #63e6be;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(99, 230, 190, 0.4);
+        }
+        .input-group { margin-bottom: 25px; }
+        .label { display: block; font-size: 0.7rem; letter-spacing: 1.5px; color: #52665e; margin-bottom: 8px; text-transform: uppercase; }
+        
+        input { 
+            width: 100%; 
+            background: rgba(0, 0, 0, 0.4); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            padding: 12px; 
+            color: #fff; 
+            font-family: inherit; 
+            box-sizing: border-box;
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        input:focus { 
+            border-color: rgba(99, 230, 190, 0.4); 
+            box-shadow: 0 0 10px rgba(99, 230, 190, 0.1);
+        }
+        
+        .btn { 
+            background: #ffffff; 
+            color: #0b0914; 
+            border: none; 
+            padding: 14px; 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            font-weight: bold;
+            width: 100%;
+            border-radius: 6px;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255,255,255,0.1);
+        }
+        .btn:hover { 
+            background: #63e6be;
+            box-shadow: 0 8px 20px rgba(99, 230, 190, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .switch-link { text-align: center; margin-top: 30px; font-size: 0.75rem; color: #4b5550; }
+        .switch-link button { background: none; border: none; color: #8a9992; cursor: pointer; font-family: inherit; text-decoration: underline; padding: 0; margin-left: 5px; }
+        .switch-link button:hover { color: #63e6be; }
+        #status-area { margin-top: 20px; font-size: 0.75rem; text-align: center; color: #52665e; min-height: 18px; }
     </style>
 </head>
 <body>
@@ -29,32 +142,32 @@
 <div class="navbar">
     <button class="hamburger-btn" onclick="toggleMenu()">☰</button>
     <div class="menu-dropdown" id="menuBox">
+        <a href="index.html">🏠 返回主页</a>
         <a href="upload.html">📂 上传控制台</a>
         <a href="admin.html">🔑 注册与登录</a>
     </div>
 </div>
 
-<div class="window">
-    <div class="title-bar">
-        <span class="title-bar-text">🔑 SYSTEM_LOGIN.EXE - 身份认证</span>
+<div class="auth-container">
+    <div class="panel-title">// IDENTITY AUTH</div>
+    
+    <div class="input-group">
+        <label class="label">Username</label>
+        <input type="text" id="login-username" placeholder="IDENTIFIER">
     </div>
-    <div class="window-body">
-        <div class="section-box">
-            <label class="label">👤 管理员标识 (Username)</label>
-            <input type="text" id="login-username" placeholder="输入用户名">
-            
-            <label class="label">🔑 矩阵效验暗号 (Password)</label>
-            <input type="password" id="login-password" placeholder="输入密码">
-            
-            <button class="btn btn-block" onclick="loginAndRedirect()">🔓 登录系统</button>
-        </div>
-        
-        <div style="text-align: center; margin-top: 15px;">
-            <span style="font-size:0.8rem;">没有账号？</span>
-            <button class="btn" style="font-size:0.75rem; padding:2px 6px;" onclick="window.location.href='register.html'">🆕 前往注册页面</button>
-        </div>
-        <div id="status-area"></div>
+    
+    <div class="input-group">
+        <label class="label">Password</label>
+        <input type="password" id="login-password" placeholder="ACCESS CIPHER">
     </div>
+    
+    <button class="btn" onclick="loginAndRedirect()">ENTER MATRIX</button>
+    
+    <div class="switch-link">
+        <span>New consciousness?</span>
+        <button onclick="window.location.href='register.html'">Register</button>
+    </div>
+    <div id="status-area"></div>
 </div>
 
 <script>
@@ -68,34 +181,28 @@
         const password = document.getElementById('login-password').value;
         const status = document.getElementById('status-area');
 
-        if (!username || !password) { status.innerText = "❌ 请填写完整的账号密码！"; return; }
-        status.innerText = "⚡ 正在核对身份...";
+        if (!username || !password) { status.innerText = "⚠ 字段尚未填写完整"; return; }
+        status.innerText = "● 正在解密身份信道...";
 
         try {
-            // 💡 借用 upload 路由，但只传空内容去测密码。如果成功，就把账号密码暂存进浏览器
             const response = await fetch('/api/upload', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'upload', username, password, caption: 'test', fileName: 'test.jpg', fileContent: 'test' })
             });
-            
             const result = await response.json();
-            
-            // 因为我们传了错误的图片格式，所以只要返回不是 401（密码错），就说明密码是对的
             if (response.status !== 401) {
-                // 记住登录凭证，传给上传页面用
                 sessionStorage.setItem('dc_user', username);
                 sessionStorage.setItem('dc_pwd', password);
-                
-                status.style.color = "green";
-                status.innerText = "🎉 欢迎回来，正在接入控制台...";
+                status.style.color = "#fff";
+                status.innerText = "✔ 认证成功。正在接入。";
                 setTimeout(() => { window.location.href = 'upload.html'; }, 1000);
             } else {
-                throw new Error(result.error || "暗号错误");
+                throw new Error(result.error || "暗号不匹配");
             }
         } catch (error) {
-            status.style.color = "red";
-            status.innerText = `❌ 拒绝访问: ${error.message}`;
+            status.style.color = "#ff6b6b";
+            status.innerText = `✕ 接入拒绝: ${error.message}`;
         }
     }
 </script>
