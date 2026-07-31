@@ -5,219 +5,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Is this a dream?</title>
-  <style>
-    body {
-      background-color: #000000;
-      color: #00ffcc;
-      font-family: "Courier New", Courier, monospace;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-      background-size: 100% 4px, 6px 100%;
-    }
-
-    .dream-text {
-      font-size: 1.2rem;
-      text-align: center;
-      margin-bottom: 30px;
-      letter-spacing: 2px;
-      text-shadow: 0 0 8px #00ffcc;
-      animation: blink 2s infinite;
-    }
-
-    .window-container {
-      background-color: #c0c0c0;
-      border: 3px solid;
-      border-color: #fff #808080 #808080 #fff;
-      width: 90%;
-      max-width: 500px;
-      padding: 3px;
-      box-shadow: 10px 10px 0px rgba(0, 255, 204, 0.3);
-    }
-
-    .window-header {
-      background: linear-gradient(90deg, #000080, #1084d0);
-      color: white;
-      padding: 4px 8px;
-      font-weight: bold;
-      font-size: 0.9rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .window-close {
-      background: #c0c0c0;
-      border: 1px solid;
-      border-color: #fff #404040 #404040 #fff;
-      padding: 0px 6px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-
-    .window-body {
-      padding: 15px;
-      background: #5a5a5a;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .photo-frame {
-      background: #000;
-      padding: 10px;
-      border: 2px inset #fff;
-      width: 100%;
-      box-sizing: border-box;
-      text-align: center;
-    }
-
-    .photo-frame img {
-      width: 100%;
-      height: auto;
-      display: block;
-      filter: contrast(1.2) saturate(0.8) blur(0.3px);
-      transition: all 0.5s ease;
-    }
-
-    .photo-frame img:hover {
-      filter: contrast(2) invert(0.1) hue-rotate(90deg);
-    }
-
-    .photo-caption {
-      color: #ff00ff;
-      margin-top: 10px;
-      font-size: 0.85rem;
-      text-shadow: 0 0 5px #ff00ff;
-    }
-
-    .nav-buttons {
-      margin-top: 15px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn {
-      background: #c0c0c0;
-      border: 2px solid;
-      border-color: #fff #404040 #404040 #fff;
-      padding: 5px 15px;
-      font-family: inherit;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .btn:active {
-      border-color: #404040 #fff #fff #404040;
-    }
-
-    @keyframes blink {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.6;
-      }
-    }
-
-    /* 🟢 开场全屏遮罩样式 */
-    #splash-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 99999;
-      /* 保证遮罩层在最最最上层 */
-      background-color: #050508;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      /* 淡出过渡效果：1秒内完成淡出 */
-      transition: opacity 1s ease-out, visibility 1s ease-out;
-    }
-
-    /* 开场图片：铺满全屏，按比例裁剪 */
-    .splash-img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      /* 保证图片不变形且充满全屏 */
-      filter: brightness(0.6);
-      /* 稍微调暗一点，显出高级感 */
-      animation: zoomEffect 3s ease-out forwards;
-      /* 图片缓慢放大的微动效 */
-    }
-
-    /* 覆盖在图片上的文字提示 */
-    .splash-title {
-      position: relative;
-      z-index: 2;
-      color: #63e6be;
-      font-family: 'Courier New', monospace;
-      font-size: 1.2rem;
-      letter-spacing: 4px;
-      text-shadow: 0 0 15px rgba(99, 230, 190, 0.8);
-      animation: pulseText 2s infinite ease-in-out;
-    }
-
-    /* 淡出时的触发类 */
-    #splash-screen.fade-out {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      /* 防止淡出后挡住点击事件 */
-    }
-
-    /* 微动效：镜头慢慢推进 */
-    @keyframes zoomEffect {
-      from {
-        transform: scale(1);
-      }
-
-      to {
-        transform: scale(1.08);
-      }
-    }
-
-    @keyframes pulseText {
-
-      0%,
-      100% {
-        opacity: 0.4;
-      }
-
-      50% {
-        opacity: 1;
-      }
-    }
-  </style>
+  <!-- 引入外部 CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- 🟢 开场全屏大图遮罩层 -->
+  <!-- 开场全屏大图遮罩层 -->
   <div id="splash-screen">
-    <img src="https://c22lnk2ptcbvbimc.private.blob.vercel-storage.com/iron-gate.jpg?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfYzIyTE5rMlBUQ0J2QmltYyIsIm93bmVySWQiOiJ0ZWFtX2o5VjlOSVJYeXBYVnMzTEl2S3RzajRIciIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzg1NTQ5NTY5Nzk5LCJpYXQiOjE3ODU1MDYzNzAyMDN9.yvWxRZI-V-j5IAdakFc2X9AfiJuZ8u1jm5iEW-CisDA&vercel-blob-signature=arTbhIqdNx-v3t0biSi6w5SdeNza30otPmNdf2BFLok" alt="Intro"
-      class="splash-img">
+    <img
+      src="https://c22lnk2ptcbvbimc.private.blob.vercel-storage.com/iron-gate-g3HDcKu72mTr3dW6Trss98uVcuH7v3?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfYzIyTE5rMlBUQ0J2QmltYyIsIm93bmVySWQiOiJ0ZWFtX2o5VjlOSVJYeXBYVnMzTEl2S3RzajRIciIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzg1NTUyNzEwMTgxLCJpYXQiOjE3ODU1MDk1MTAzMzd9.-i3pMREUNVOFYMWbzK2ZNRq893vymv90b6j87gU17Lc&vercel-blob-signature=azo4R_-08znh_Z2EyURaZvRuDZ7g5Z9aTHgkC_-Gh4Y"
+      alt="Intro" class="splash-img">
     <div class="splash-title">// ENTERING THE DREAMSCAPE //</div>
   </div>
 
-  <audio id="bgm" src="https://c22lnk2ptcbvbimc.private.blob.vercel-storage.com/back-ground-music/lofi/0001-gazDHUhjAMPraJfApjzL7ZCUP1TlH9.m4a?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfYzIyTE5rMlBUQ0J2QmltYyIsIm93bmVySWQiOiJ0ZWFtX2o5VjlOSVJYeXBYVnMzTEl2S3RzajRIciIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzg1NTQ5MzQ4MDMyLCJpYXQiOjE3ODU1MDYxNDg0MTJ9.XAS6faNC9oU1V_BcQKWRjiCaJMqxtI6u-4qtbq5sr3Y&vercel-blob-signature=fcsNRyq_iUAHFVKyK5mKeeY96-GanFR0bA7KwDEcTvc" loop></audio>
+  <audio id="bgm"
+    src="https://c22lnk2ptcbvbimc.private.blob.vercel-storage.com/back-ground-music/lofi/0001-gazDHUhjAMPraJfApjzL7ZCUP1TlH9.m4a?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfYzIyTE5rMlBUQ0J2QmltYyIsIm93bmVySWQiOiJ0ZWFtX2o5VjlOSVJYeXBYVnMzTEl2S3RzajRIciIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzg1NTQ5MzQ4MDMyLCJpYXQiOjE3ODU1MDYxNDg0MTJ9.XAS6faNC9oU1V_BcQKWRjiCaJMqxtI6u-4qtbq5sr3Y&vercel-blob-signature=fcsNRyq_iUAHFVKyK5mKeeY96-GanFR0bA7KwDEcTvc"
+    loop></audio>
 
   <div class="dream-text">
     你记得这里吗？<br>
@@ -232,7 +36,7 @@
     <div class="window-body">
       <div class="photo-frame">
         <div id="gallery-container" class="gallery-grid">
-        <img id="gallery" src="images/pic1.jpg" alt="dreamcore">
+          <img id="gallery" src="images/pic1.jpg" alt="dreamcore">
         </div>
         <div class="photo-caption" id="caption">这是你醒来前看到的最后一幕。</div>
       </div>
@@ -245,120 +49,8 @@
     </div>
   </div>
 
-  <script>
-    /// read pics
-    let memories = [];
-
-    fetch('data.json')
-      .then(response => {
-        if (!response.ok) throw new Error("无法读取账本");
-        return response.json();
-      })
-      .then(data => {
-        memories = data; // 拿到完整的照片和文案数组
-
-        // 如果账本里有数据，渲染第一张图到页面上
-        if (memories.length > 0) {
-          // 假设你的图片标签 id 是展示用的展示框
-          const imgElement = document.getElementById('gallery-image');
-          const captionElement = document.getElementById('gallery-caption');
-
-          if (imgElement) imgElement.src = memories[0].url;
-          if (captionElement) captionElement.innerText = memories[0].text;
-
-          // 💡 如果你以前的代码有记录上传者，你甚至可以利用 item.by 把它显示出来
-          console.log(`这张图是由 ${memories[0].by || '神秘人'} 载入的`);
-        }
-      })
-      .catch(err => {
-        console.error("加载失败: ", err);
-      });
-
-    /// slide images
-    function changeMemory(direction) {
-      if (memories.length === 0) return;
-
-      currentIndex += direction;
-      if (currentIndex >= memories.length) currentIndex = 0;
-      if (currentIndex < 0) currentIndex = memories.length - 1;
-
-      imgElement.style.opacity = 0.3;
-
-      setTimeout(() => {
-        imgElement.src = memories[currentIndex].url;
-        captionElement.innerText = memories[currentIndex].text;
-        imgElement.style.opacity = 1;
-      }, 150);
-    }
-
-    // music player
-    let isPlaying = false;
-    const bgm = document.getElementById('bgm');
-    const musicBtn = document.getElementById('musicBtn');
-
-    function toggleMusic() {
-      if (!isPlaying) {
-        bgm.play().then(() => {
-          isPlaying = true;
-          musicBtn.innerText = "⏸ 暂停声音";
-          bgm.playbackRate = 0.85;
-        }).catch(err => {
-          console.log("播放失败，需要用户交互:", err);
-        });
-      } else {
-        bgm.pause();
-        isPlaying = false;
-        musicBtn.innerText = "🎵 播放声音";
-      }
-    }
-
-
-    // 开场遮罩自动淡出逻辑
-    window.addEventListener('DOMContentLoaded', () => {
-      const splash = document.getElementById('splash-screen');
-
-      // 页面加载完成后，等待 2 秒（2000毫秒），然后开始淡出
-      setTimeout(() => {
-        splash.classList.add('fade-out');
-      }, 2000);
-    });
-
-
-    // 页面加载完成后自动去获取 thai/ 文件夹下的所有图片
-    window.addEventListener('DOMContentLoaded', async () => {
-        const gallery = document.getElementById('gallery-container');
-        gallery.innerHTML = '<p class="loading-text">// 正在提取记忆碎片...</p>';
-
-
-        try {
-            // 请求刚才建立的 API 接口
-            const response = await fetch('/api/get-thai-images');
-            const data = await response.json();
-
-            if (data.success && data.images.length > 0) {
-                gallery.innerHTML = ''; // 清空加载提示
-
-                // 遍历每一个获取到的图片链接并渲染到页面上
-                data.images.forEach(url => {
-                    const img = document.createElement('img');
-                    img.src = url;
-                    img.alt = "Thai Memory";
-                    img.loading = "lazy"; // 开启懒加载，提升网页打开速度
-                    img.classList.add('gallery-img');
-                    
-                    gallery.appendChild(img);
-                });
-            } else {
-                gallery.innerHTML = '<p class="loading-text">未找到图片，请确认 thai/ 文件夹下是否有文件。</p>';
-            }
-        } catch (error) {
-            console.error('加载图片失败:', error);
-            gallery.innerHTML = '<p class="loading-text">✕ 数据拉取失败</p>';
-        }
-    });
-
-
-  </script>
+  <!-- 引入外部 JS 脚本 -->
+  <script src="script.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,174 @@
+body {
+  background-color: #000000;
+  color: #00ffcc;
+  font-family: "Courier New", Courier, monospace;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 4px, 6px 100%;
+}
+
+.dream-text {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px #00ffcc;
+  animation: blink 2s infinite;
+}
+
+.window-container {
+  background-color: #c0c0c0;
+  border: 3px solid;
+  border-color: #fff #808080 #808080 #fff;
+  width: 90%;
+  max-width: 500px;
+  padding: 3px;
+  box-shadow: 10px 10px 0px rgba(0, 255, 204, 0.3);
+}
+
+.window-header {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: white;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.window-close {
+  background: #c0c0c0;
+  border: 1px solid;
+  border-color: #fff #404040 #404040 #fff;
+  padding: 0px 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.window-body {
+  padding: 15px;
+  background: #5a5a5a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.photo-frame {
+  background: #000;
+  padding: 10px;
+  border: 2px inset #fff;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.photo-frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: contrast(1.2) saturate(0.8) blur(0.3px);
+  transition: all 0.5s ease;
+}
+
+.photo-frame img:hover {
+  filter: contrast(2) invert(0.1) hue-rotate(90deg);
+}
+
+.photo-caption {
+  color: #ff00ff;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  text-shadow: 0 0 5px #ff00ff;
+}
+
+.nav-buttons {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: #fff #404040 #404040 #fff;
+  padding: 5px 15px;
+  font-family: inherit;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn:active {
+  border-color: #404040 #fff #fff #404040;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* 开场全屏遮罩样式 */
+#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  background-color: #050508;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  transform: translateX(0%);
+  transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1), visibility 1.2s;
+}
+
+/* 🟢 触发开门时：整扇门向右滑出屏幕 */
+#splash-screen.fade-out {
+  transform: translateX(100%);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* 开场图片 */
+.splash-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6);
+  animation: zoomEffect 3s ease-out forwards;
+}
+
+/* 覆盖在图片上的文字提示 */
+.splash-title {
+  position: relative;
+  z-index: 2;
+  color: #63e6be;
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px rgba(99, 230, 190, 0.8);
+  animation: pulseText 2s infinite ease-in-out;
+}
+
+@keyframes zoomEffect {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+@keyframes pulseText {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
