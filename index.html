@@ -212,12 +212,12 @@
 
   <!-- 🟢 开场全屏大图遮罩层 -->
   <div id="splash-screen">
-    <img src="images/iron-gate.jpg" alt="Intro"
+    <img src="https://c22lnk2ptcbvbimc.private.blob.vercel-storage.com/iron-gate.jpg?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfYzIyTE5rMlBUQ0J2QmltYyIsIm93bmVySWQiOiJ0ZWFtX2o5VjlOSVJYeXBYVnMzTEl2S3RzajRIciIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzg1NTQ5NTY5Nzk5LCJpYXQiOjE3ODU1MDYzNzAyMDN9.yvWxRZI-V-j5IAdakFc2X9AfiJuZ8u1jm5iEW-CisDA&vercel-blob-signature=arTbhIqdNx-v3t0biSi6w5SdeNza30otPmNdf2BFLok" alt="Intro"
       class="splash-img">
     <div class="splash-title">// ENTERING THE DREAMSCAPE //</div>
   </div>
 
-  <audio id="bgm" src="music/lofi/0001.m4a" loop></audio>
+  <audio id="bgm" src="https://c22lnk2ptcbvbimc.private.blob.vercel-storage.com/back-ground-music/lofi/0001-gazDHUhjAMPraJfApjzL7ZCUP1TlH9.m4a?vercel-blob-delegation=eyJzdG9yZUlkIjoic3RvcmVfYzIyTE5rMlBUQ0J2QmltYyIsIm93bmVySWQiOiJ0ZWFtX2o5VjlOSVJYeXBYVnMzTEl2S3RzajRIciIsInBhdGhuYW1lIjoiKiIsIm9wZXJhdGlvbnMiOlsiZ2V0IiwiaGVhZCJdLCJ2YWxpZFVudGlsIjoxNzg1NTQ5MzQ4MDMyLCJpYXQiOjE3ODU1MDYxNDg0MTJ9.XAS6faNC9oU1V_BcQKWRjiCaJMqxtI6u-4qtbq5sr3Y&vercel-blob-signature=fcsNRyq_iUAHFVKyK5mKeeY96-GanFR0bA7KwDEcTvc" loop></audio>
 
   <div class="dream-text">
     你记得这里吗？<br>
@@ -231,7 +231,9 @@
     </div>
     <div class="window-body">
       <div class="photo-frame">
+        <div id="gallery-container" class="gallery-grid">
         <img id="gallery" src="images/pic1.jpg" alt="dreamcore">
+        </div>
         <div class="photo-caption" id="caption">这是你醒来前看到的最后一幕。</div>
       </div>
 
@@ -310,7 +312,8 @@
       }
     }
 
-    // 🟢 开场遮罩自动淡出逻辑
+
+    // 开场遮罩自动淡出逻辑
     window.addEventListener('DOMContentLoaded', () => {
       const splash = document.getElementById('splash-screen');
 
@@ -319,6 +322,42 @@
         splash.classList.add('fade-out');
       }, 2000);
     });
+
+
+    // 页面加载完成后自动去获取 thai/ 文件夹下的所有图片
+    window.addEventListener('DOMContentLoaded', async () => {
+        const gallery = document.getElementById('gallery-container');
+        gallery.innerHTML = '<p class="loading-text">// 正在提取记忆碎片...</p>';
+
+
+        try {
+            // 请求刚才建立的 API 接口
+            const response = await fetch('/api/get-thai-images');
+            const data = await response.json();
+
+            if (data.success && data.images.length > 0) {
+                gallery.innerHTML = ''; // 清空加载提示
+
+                // 遍历每一个获取到的图片链接并渲染到页面上
+                data.images.forEach(url => {
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.alt = "Thai Memory";
+                    img.loading = "lazy"; // 开启懒加载，提升网页打开速度
+                    img.classList.add('gallery-img');
+                    
+                    gallery.appendChild(img);
+                });
+            } else {
+                gallery.innerHTML = '<p class="loading-text">未找到图片，请确认 thai/ 文件夹下是否有文件。</p>';
+            }
+        } catch (error) {
+            console.error('加载图片失败:', error);
+            gallery.innerHTML = '<p class="loading-text">✕ 数据拉取失败</p>';
+        }
+    });
+
+
   </script>
 </body>
 
