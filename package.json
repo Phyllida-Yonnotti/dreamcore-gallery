@@ -5,6 +5,7 @@
   "main": "api/upload.js",
   "type": "module",
   "dependencies": {
-    "@supabase/supabase-js": "^2.43.0"
+    "@supabase/supabase-js": "^2.43.0",
+    "@vercel/blob": "^0.23.0"
   }
 }
