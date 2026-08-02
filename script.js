@@ -91,7 +91,7 @@ async function loadThaiGallery() {
   gallery.innerHTML = '<p class="loading-text">// 正在提取记忆碎片...</p>';
 
   try {
-    const response = await fetch('/api/get-thai-images');
+    const response = await fetch('/api/blob-image-upload');
     const data = await response.json();
 
     if (data.success && data.images.length > 0) {
