@@ -6,7 +6,7 @@ let isPlaying = false;
 // 页面 DOM 加载完成后统一初始化
 window.addEventListener('DOMContentLoaded', () => {
   
-  // 1. 开场遮罩：点击后向右平滑移出（开门）
+  // 开场遮罩：点击后向右平滑移出（开门）
   const splash = document.getElementById('splash-screen');
   if (splash) {
     // 监听用户的点击 / 触摸点击事件
@@ -15,24 +15,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 2. 加载 data.json 记忆数据
-  fetch('data.json')
-    .then(response => {
-      if (!response.ok) throw new Error("无法读取账本");
-      return response.json();
-    })
-    .then(data => {
-      memories = data;
-      if (memories.length > 0) {
-        updateMemoryView();
-        console.log(`这张图是由 ${memories[0].by || '神秘人'} 载入的`);
-      }
-    })
-    .catch(err => {
-      console.error("加载失败: ", err);
-    });
-
-  // 3. 动态从 API 获取 thai/ 文件夹下的所有图片并渲染到画廊
+  // 动态从 API 获取 thai/ 文件夹下的所有图片并渲染到画廊
   loadThaiGallery();
 });
 
