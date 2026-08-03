@@ -1,0 +1,157 @@
+---
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Is this a dream?">
+  <!-- 1. 开场全屏大图遮罩层 -->
+  <div id="splash-screen">
+    <!-- ⚠️ 请替换成你在 Public Blob 存储桶里拿到的真实 CDN 网址 -->
+    <img src="https://<YOUR-PUBLIC-BLOB>.public.blob.vercel-storage.com/iron-gate.jpg" alt="Iron Gate Intro" class="splash-img" />
+  </div>
+
+  <!-- 2. 背景音乐 -->
+  <audio id="bgm" src="https://<YOUR-PUBLIC-BLOB>.public.blob.vercel-storage.com/bgm.m4a" loop></audio>
+
+  <div class="dream-text">
+    -----------<br />
+    jisichong
+  </div>
+
+  <!-- 3. 主窗口内容 -->
+  <div class="window-container">
+    <div class="window-header">
+      <span>Memory_Viewer.exe</span>
+      <button class="window-close" id="closeBtn">X</button>
+    </div>
+    <div class="window-body">
+      <div class="photo-frame">
+        <div id="gallery-container" class="gallery-grid">
+          <img id="gallery" class="gallery-img" alt="Memory Image" />
+        </div>
+        <div class="photo-caption" id="caption">这是你醒来前看到的最后一幕。</div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="btn" id="prevBtn">◀ 上一段</button>
+        <button class="btn" id="musicBtn">🎵 播放声音</button>
+        <button class="btn" id="nextBtn">下一段 ▶</button>
+      </div>
+
+      <!-- 4. 文件上传区域 -->
+      <div style="margin-top: 20px; text-align: center;">
+        <input type="file" id="avatarInput" accept="image/jpeg, image/png, image/webp" />
+        <button class="btn" id="uploadBtn">Upload</button>
+        <p id="uploadStatus" style="font-size: 12px; margin-top: 5px; color: #888;"></p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<!-- 客户端交互逻辑 -->
+<script>
+  let memories = [];
+  let currentIndex = 0;
+  let isPlaying = false;
+
+  // 从 API 加载 Blob 里的图片列表
+  async function loadThaiGallery() {
+    try {
+      const response = await fetch('/api/blob-image-upload');
+      const data = await response.json();
+
+      if (data.success && data.images.length > 0) {
+        memories = data.images.map(url => ({ url, text: '这是你醒来前看到的最后一幕。' }));
+        currentIndex = 0;
+        updateMemoryView();
+      }
+    } catch (error) {
+      console.error('加载图片失败:', error);
+    }
+  }
+
+  function updateMemoryView() {
+    const imgElement = document.getElementById('gallery') as HTMLImageElement;
+    if (imgElement && memories[currentIndex]) {
+      imgElement.style.opacity = '0.3';
+      setTimeout(() => {
+        imgElement.src = memories[currentIndex].url;
+        imgElement.style.opacity = '1';
+      }, 150);
+    }
+  }
+
+  // 绑定交互事件
+  document.addEventListener('DOMContentLoaded', () => {
+    loadThaiGallery();
+
+    // 开场遮罩点击关闭
+    document.getElementById('splash-screen')?.addEventListener('click', (e) => {
+      (e.currentTarget as HTMLElement).classList.add('fade-out');
+    });
+
+    // 关闭按钮逻辑
+    document.getElementById('closeBtn')?.addEventListener('click', () => {
+      alert('你无法逃离这里。');
+    });
+
+    // 上一张/下一张切换
+    document.getElementById('prevBtn')?.addEventListener('click', () => {
+      if (!memories.length) return;
+      currentIndex = (currentIndex - 1 + memories.length) % memories.length;
+      updateMemoryView();
+    });
+
+    document.getElementById('nextBtn')?.addEventListener('click', () => {
+      if (!memories.length) return;
+      currentIndex = (currentIndex + 1) % memories.length;
+      updateMemoryView();
+    });
+
+    // 音乐播放/暂停
+    const bgm = document.getElementById('bgm') as HTMLAudioElement;
+    const musicBtn = document.getElementById('musicBtn');
+    musicBtn?.addEventListener('click', () => {
+      if (!isPlaying && bgm) {
+        bgm.play().then(() => {
+          isPlaying = true;
+          musicBtn.innerText = "⏸ 暂停声音";
+        });
+      } else if (bgm) {
+        bgm.pause();
+        isPlaying = false;
+        musicBtn.innerText = "🎵 播放声音";
+      }
+    });
+
+    // 上传文件按钮逻辑
+    document.getElementById('uploadBtn')?.addEventListener('click', async () => {
+      const fileInput = document.getElementById('avatarInput') as HTMLInputElement;
+      const statusText = document.getElementById('uploadStatus');
+
+      if (!fileInput?.files?.[0]) {
+        alert('请先选择要上传的文件！');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      if (statusText) statusText.innerText = '正在上传到 Vercel Blob...';
+
+      try {
+        const response = await fetch(`/api/avatar/upload?filename=${encodeURIComponent(file.name)}`, {
+          method: 'POST',
+          body: file,
+        });
+
+        if (!response.ok) throw new Error('上传失败');
+
+        if (statusText) statusText.innerText = '上传成功！正在刷新...';
+        fileInput.value = '';
+        await loadThaiGallery(); // 重新拉取画廊
+      } catch (err) {
+        console.error(err);
+        if (statusText) statusText.innerText = '✕ 上传失败';
+      }
+    });
+  });
+</script>

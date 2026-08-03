@@ -1,0 +1,186 @@
+---
+// src/layouts/Layout.astro
+interface Props {
+  title?: string;
+}
+
+const { title = "Is this a dream?" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<!-- 使用 is:global 让里面的 CSS 成为全局样式，完美适配所有组件 -->
+<style is:global>
+  /* 基础重置 */
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #0d0d0d;
+    color: #e0e0e0;
+    font-family: 'Courier New', Courier, monospace;
+    overflow-x: hidden;
+  }
+
+  /* 开场全屏大图遮罩层 */
+  #splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    z-index: 9999;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+  }
+
+  #splash-screen.fade-out {
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .splash-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+
+  /* 梦境氛围文字 */
+  .dream-text {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 14px;
+    color: #666;
+    letter-spacing: 2px;
+    line-height: 1.5;
+    z-index: 1;
+  }
+
+  /* 复古复古记忆窗口外壳 */
+  .window-container {
+    max-width: 600px;
+    margin: 80px auto 40px;
+    border: 1px solid #333;
+    background-color: #141414;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    position: relative;
+    z-index: 2;
+  }
+
+  .window-header {
+    background-color: #222;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    font-size: 13px;
+    color: #aaa;
+  }
+
+  .window-close {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+  }
+
+  .window-close:hover {
+    color: #ff5555;
+  }
+
+  .window-body {
+    padding: 20px;
+  }
+
+  /* 相框与图片区域 */
+  .photo-frame {
+    border: 1px solid #2a2a2a;
+    padding: 15px;
+    background-color: #0a0a0a;
+    text-align: center;
+  }
+
+  .gallery-grid {
+    min-height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .gallery-img {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  .loading-text {
+    color: #555;
+    font-size: 14px;
+  }
+
+  .photo-caption {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #888;
+    letter-spacing: 1px;
+  }
+
+  /* 导航按钮组 */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+  }
+
+  .btn {
+    flex: 1;
+    background-color: #1f1f1f;
+    border: 1px solid #333;
+    color: #ccc;
+    padding: 10px 15px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    background-color: #2a2a2a;
+    border-color: #555;
+    color: #fff;
+  }
+
+  /* 文件上传输入框简单调整 */
+  input[type="file"] {
+    font-family: inherit;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+  }
+</style>
