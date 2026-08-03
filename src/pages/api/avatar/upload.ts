@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const customToken = process.env.BLOB_PUBLIC_WEBHOOK_PUBLIC_KEY;
+    const customToken = process.env.BLOB_PUBLIC_READ_WRITE_TOKEN;
 
     // 🌟 2. 此时 request.body 已经被收窄（Type Narrowing），不再为 null
     const blob = await put(`thai/${filename}`, request.body, {

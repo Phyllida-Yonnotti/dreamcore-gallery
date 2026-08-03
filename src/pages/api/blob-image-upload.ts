@@ -4,7 +4,7 @@ import { list } from '@vercel/blob';
 export const GET: APIRoute = async () => {
   try {
     // 关键：从 process.env 显式获取你指定的 Token 变量
-    const customToken = process.env.BLOB_PUBLIC_WEBHOOK_PUBLIC_KEY;
+    const customToken = process.env.BLOB_PUBLIC_READ_WRITE_TOKEN;
 
     // 将 token 明确传递给 list 方法
     const { blobs } = await list({ 
