@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 
 const IMAGE_A_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/dfa5RplDdfaAgd.png";
 const SUBTITLE_TEXT_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/oiTru6Rwtjlsa.png";
+const BG_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IMG_9871.jpg";
 ---
 
 <!-- 将 Layout 当作标签包裹住页面的具体内容 -->
@@ -13,8 +14,8 @@ const SUBTITLE_TEXT_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.c
       <img src={IMAGE_A_URL} alt="Splash Image" />
     </div>
 
-    <!-- 动态模糊背景 -->
-    <div id="bg-blur" class="bg-blur"></div>
+    <!-- 背景 -->
+    <div id="bg-blur" class="bg-blur" style={`background-image: url('${FIXED_BG_URL}');`}></div>
 
     <!-- subtitle -->
     <div class="subtitle-container">
