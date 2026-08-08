@@ -1,3 +1,5 @@
+import { gsap } from 'gsap';
+
 let images: string[] = [];
 let currentIndex = 0;
 
@@ -6,8 +8,9 @@ const bgBlur = document.getElementById('bg-blur')!;
 const mainImg = document.getElementById('main-img') as HTMLImageElement;
 const prevBtn = document.getElementById('prev-btn')!;
 const nextBtn = document.getElementById('next-btn')!;
+const subtitle = document.querySelector('.subtitle-container') as HTMLElement;
 
-// 1. 获取 thai 文件夹下的所有图片 URL
+// 1. 从 API 获取图片列表
 async function fetchImages() {
   try {
     const response = await fetch('/api/images');
@@ -16,10 +19,8 @@ async function fetchImages() {
     }
     images = await response.json();
 
-    console.log('加载到的图片列表:', images);
-
     if (Array.isArray(images) && images.length > 0) {
-      updateDisplay(0);
+      updateDisplay(0, true); // 首次加载不显示过度动画
     } else {
       console.warn('⚠️ 接口返回的图片列表为空，请检查 Blob 文件夹 prefix 是否匹配');
     }
@@ -28,28 +29,68 @@ async function fetchImages() {
   }
 }
 
-// 2. 更新页面显示的图片和背景
-function updateDisplay(index: number) {
+// 2. 使用 GSAP 平滑更新页面图片和背景
+function updateDisplay(index: number, isInitial = false) {
   if (images.length === 0) return;
   
   currentIndex = (index + images.length) % images.length;
   const currentUrl = images[currentIndex];
 
-  // 淡入淡出切换
-  mainImg.style.opacity = '0.3';
-  setTimeout(() => {
+  if (isInitial) {
     mainImg.src = currentUrl;
     bgBlur.style.backgroundImage = `url('${currentUrl}')`;
-    mainImg.style.opacity = '1';
-  }, 150);
+    return;
+  }
+
+  // 使用 GSAP 打造更细腻的淡入淡出 + 微微缩放质感
+  gsap.to(mainImg, {
+    opacity: 0.2,
+    scale: 0.96,
+    duration: 0.2,
+    ease: 'power1.out',
+    onComplete: () => {
+      mainImg.src = currentUrl;
+      bgBlur.style.backgroundImage = `url('${currentUrl}')`;
+
+      gsap.to(mainImg, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.35,
+        ease: 'power2.out'
+      });
+    }
+  });
 }
 
-// 3. 点击图片 A 淡出退出
+// 3. 点击铁门：GSAP 模拟厚重铁门向右推开 + 照片弹出动画
 splash.addEventListener('click', () => {
-  splash.classList.add('dismissed');
+  // 1. 铁门向右滑动并淡出
+  gsap.to(splash, {
+    x: '100vw',
+    opacity: 0,
+    duration: 1.8,
+    ease: 'power3.inOut',
+    onComplete: () => {
+      splash.style.display = 'none'; // 动画结束后卸载点击拦截
+    }
+  });
+
+  // 2. 推开门的同时，中间的照片从缩小微弹变大出现（电影感入场）
+  gsap.fromTo('.image-wrapper', 
+    { scale: 0.85, opacity: 0 },
+    { scale: 1, opacity: 1, duration: 1.2, delay: 0.3, ease: 'back.out(1.4)' }
+  );
+
+  // 3. 手写字同时轻轻浮现
+  if (subtitle) {
+    gsap.fromTo(subtitle,
+      { y: -20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 1, delay: 0.5, ease: 'power2.out' }
+    );
+  }
 });
 
-// 4. 按钮事件
+// 4. 按钮切换事件
 prevBtn.addEventListener('click', () => {
   updateDisplay(currentIndex - 1);
 });
@@ -58,5 +99,5 @@ nextBtn.addEventListener('click', () => {
   updateDisplay(currentIndex + 1);
 });
 
-// 页面加载完成后拉取图片
+// 初始化拉取数据
 fetchImages();

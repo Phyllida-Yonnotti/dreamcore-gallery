@@ -13,7 +13,7 @@ body, html {
   font-family: sans-serif;
 }
 
-/* 全屏容器 - 保证所有元素在屏幕正中间 */
+/* 全屏容器 */
 .app-container {
   position: relative;
   width: 100vw;
@@ -25,7 +25,7 @@ body, html {
 }
 
 /* ========================================================
-   图片 A 封面层（Splash Screen）- 向右如重门般平移离场
+   图片 A 封面层（Splash Screen）- 由 GSAP 接管动画
    ======================================================== */
 .splash-screen {
   position: absolute;
@@ -34,9 +34,9 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: transparent; /* 容器透明 */
+  background-color: transparent;
   cursor: pointer;
-  transition: transform 3s cubic-bezier(0.22, 1, 0.36, 1), opacity 6s ease-out;
+  will-change: transform, opacity; /* 硬件加速提升流畅度 */
 }
 
 .splash-screen img {
@@ -45,13 +45,31 @@ body, html {
   height: 100dvh;
   object-fit: cover;
   user-select: none;
-  mix-blend-mode: screen; /* 自动过滤黑色背景 */
+  mix-blend-mode: screen; /* 过滤黑色背景 */
 }
 
-.splash-screen.dismissed {
-  transform: translateX(100vw);
-  opacity: 0;
-  pointer-events: none;
+/* ========================================================
+   手写字 Subtitle 样式（整合干净）
+   ======================================================== */
+.subtitle-container {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  width: 100vw;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* 穿透点击 */
+  background: transparent;
+}
+
+.subtitle-container img {
+  width: 100%;
+  height: auto;
+  max-height: 25vh;
+  object-fit: contain;
+  user-select: none;
 }
 
 /* ========================================================
@@ -69,7 +87,7 @@ body, html {
 }
 
 /* ========================================================
-   正中间画廊图片（无白边、固定大小、自动撑满、带阴影）
+   正中间画廊照片
    ======================================================== */
 .gallery-container {
   position: relative;
@@ -79,39 +97,31 @@ body, html {
   align-items: center;
 }
 
-/* 取消原本的白色相框外壳 */
 .card {
-  background: transparent; /* 去除白色背景 */
-  padding: 0;              /* 去除内边距边框 */
-  box-shadow: none;        /* 去除卡片阴影 */
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* 固定大小的图片容器（在手机和电脑上保持固定比例与尺寸） */
 .image-wrapper {
-  /* 手机端尺寸 */
   width: 85vw;
   height: 55vh;
-  /* 桌面/大屏最大固定尺寸 */
   max-width: 650px;
   max-height: 480px;
-  
-  border-radius: 12px;      /* 给图片加一点微圆角，质感更好 */
+  border-radius: 12px;
   overflow: hidden;
-  background-color: #1a1a1a; /* 未加载出图片时的默认暗色背景 */
-  
-  /* 精致的阴影效果：让图片从背景中浮现出来 */
+  background-color: #1a1a1a;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+  will-change: transform, opacity;
 }
 
-/* 图片强行撑满固定容器 */
 .image-wrapper img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 核心：无论图片宽高比例如何，完全填满并等比例裁剪 */
-  transition: opacity 0.3s ease;
+  object-fit: cover;
 }
 
 /* 控制按钮样式 */
@@ -157,32 +167,4 @@ body, html {
   stroke-width: 2.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-
-.subtitle-container {
-  background: transparent;
-  margin-left: 0;
-  margin-right: 0;
-}
-
-
-.subtitle-container {
-  position: absolute;
-  top: 10%; /* 控制手写字在屏幕上的垂直位置（可根据需求调整，如 5% 或 15%） */
-  left: 0;
-  width: 100vw; /* 强制从左到右撑满整个屏幕宽度 */
-  z-index: 20; /* 层级高于背景和画廊图片(z-index: 10)，但不挡住遮罩层(z-index: 50) */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  pointer-events: none; /* 关键：穿透点击，避免阻挡相框和按钮的操作 */
-}
-
-.subtitle-container img {
-  width: 100%; /* 从左到右撑满 */
-  height: auto; /* 保持图片原始宽高比 */
-  max-height: 25vh; /* 避免在手机端太高遮挡过多页面 */
-  object-fit: contain; /* 确保图片完整显示不被拉伸变形 */
-  user-select: none;
 }

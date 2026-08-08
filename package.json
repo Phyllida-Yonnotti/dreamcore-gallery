@@ -16,6 +16,7 @@
     "@astrojs/vercel": "^11.0.5",
     "@vercel/blob": "^2.6.1",
     "astro": "^7.1.4",
+    "gasp": "^0.0.2",
     "typescript": "^6.0.3"
   },
   "devDependencies": {
