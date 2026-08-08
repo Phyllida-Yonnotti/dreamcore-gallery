@@ -6,7 +6,7 @@ export const prerender = false; // 确保是 SSR 动态渲染
 export const GET: APIRoute = async () => {
   try {
     // 1. 获取 Token（优先读取自定义 Token，若无则读取默认 Token）
-    const token = import.meta.env.MY_CUSTOM_BLOB_TOKEN || import.meta.env.BLOB_READ_WRITE_TOKEN;
+    const token = import.meta.env.BLOB_PUBLIC_WEBHOOK_PUBLIC_KEY || import.meta.env.BLOB_READ_WRITE_TOKEN;
 
     if (!token) {
       console.error('❌ 未找到 Vercel Blob Token，请检查环境变量设置');
