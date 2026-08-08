@@ -9,7 +9,7 @@ const prevBtn = document.getElementById('prev-btn')!;
 const nextBtn = document.getElementById('next-btn')!;
 const subtitle = document.querySelector('.subtitle-container') as HTMLElement;
 
-// 1. 获取图片列表
+// 获取图片列表
 async function fetchImages() {
   try {
     const response = await fetch('/api/images');
@@ -26,7 +26,21 @@ async function fetchImages() {
   }
 }
 
-// 2. 更新页面图片（不再动态修改背景）
+// 预加载前后图片的函数
+function preloadAdjacentImages() {
+  if (images.length <= 1) return;
+
+  const nextIndex = (currentIndex + 1) % images.length;
+  const prevIndex = (currentIndex - 1 + images.length) % images.length;
+
+  // 创建隐藏的 Image 对象触发浏览器缓存
+  const imgNext = new Image();
+  imgNext.src = images[nextIndex];
+
+  const imgPrev = new Image();
+  imgPrev.src = images[prevIndex];
+}
+
 function updateDisplay(index: number, isInitial = false) {
   if (images.length === 0) return;
   
@@ -35,6 +49,7 @@ function updateDisplay(index: number, isInitial = false) {
 
   if (isInitial) {
     mainImg.src = currentUrl;
+    preloadAdjacentImages(); // 👈 首次加载后预加载邻近图片
     return;
   }
 
@@ -44,19 +59,22 @@ function updateDisplay(index: number, isInitial = false) {
     duration: 0.18,
     ease: 'power1.out',
     onComplete: () => {
-      mainImg.src = currentUrl; // 👈 仅切换相框内的原图
+      mainImg.src = currentUrl;
 
       gsap.to('.image-wrapper', {
         opacity: 1,
         scale: 1,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        onComplete: () => {
+          preloadAdjacentImages(); // 👈 每次切换完成后预加载下两张
+        }
       });
     }
   });
 }
 
-// 3. 点击铁门推开
+// 点击铁门移开
 splash.addEventListener('click', () => {
   gsap.to(splash, {
     x: '100vw',
@@ -81,7 +99,7 @@ splash.addEventListener('click', () => {
   }
 });
 
-// 4. 按钮事件
+// 左右按钮事件
 prevBtn.addEventListener('click', () => updateDisplay(currentIndex - 1));
 nextBtn.addEventListener('click', () => updateDisplay(currentIndex + 1));
 

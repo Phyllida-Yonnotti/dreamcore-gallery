@@ -11,7 +11,7 @@ const BG_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IM
   <div class="app-container">
     <!-- 图片 A 封面层 -->
     <div id="splash" class="splash-screen">
-      <img src={IMAGE_A_URL} alt="Splash Image" />
+      <img src={IMAGE_A_URL} alt="Splash Image" fetchpriority="high"/>
     </div>
 
     <!-- 背景 -->
@@ -26,7 +26,7 @@ const BG_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IM
     <div class="gallery-container">
       <div class="card">
         <div class="image-wrapper">
-          <img id="main-img" src="" alt="Gallery Image" />
+          <img id="main-img" src="" alt="Gallery Image" loading="eager"/>
         </div>
         <div class="controls">
           <button id="prev-btn" class="btn" aria-label="Previous">

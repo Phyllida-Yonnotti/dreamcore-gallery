@@ -80,7 +80,7 @@ body, html {
   inset: -20px;
   background-size: cover;
   background-position: center;
-  filter: blur(35px) brightness(0.6);
+  filter: blur(5px) brightness(0.6);
   transform: scale(1.1);
   /* transition: background-image 0.5s ease; 👈 可以删掉这行 */
   z-index: 1;
