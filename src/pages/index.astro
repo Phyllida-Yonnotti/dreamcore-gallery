@@ -37,13 +37,6 @@ import Layout from '../layouts/Layout.astro';
         <button class="btn" id="musicBtn">🎵 播放声音</button>
         <button class="btn" id="nextBtn">下一段 ▶</button>
       </div>
-
-      <!-- 4. 文件上传区域 -->
-      <div style="margin-top: 20px; text-align: center;">
-        <input type="file" id="avatarInput" accept="image/jpeg, image/png, image/webp" />
-        <button class="btn" id="uploadBtn">Upload</button>
-        <p id="uploadStatus" style="font-size: 12px; margin-top: 5px; color: #888;"></p>
-      </div>
     </div>
   </div>
 </Layout>
@@ -121,36 +114,6 @@ import Layout from '../layouts/Layout.astro';
         bgm.pause();
         isPlaying = false;
         musicBtn.innerText = "🎵 播放声音";
-      }
-    });
-
-    // 上传文件按钮逻辑
-    document.getElementById('uploadBtn')?.addEventListener('click', async () => {
-      const fileInput = document.getElementById('avatarInput') as HTMLInputElement;
-      const statusText = document.getElementById('uploadStatus');
-
-      if (!fileInput?.files?.[0]) {
-        alert('请先选择要上传的文件！');
-        return;
-      }
-
-      const file = fileInput.files[0];
-      if (statusText) statusText.innerText = '正在上传到 Vercel Blob...';
-
-      try {
-        const response = await fetch(`/api/avatar/upload?filename=${encodeURIComponent(file.name)}`, {
-          method: 'POST',
-          body: file,
-        });
-
-        if (!response.ok) throw new Error('上传失败');
-
-        if (statusText) statusText.innerText = '上传成功！正在刷新...';
-        fileInput.value = '';
-        await loadThaiGallery(); // 重新拉取画廊
-      } catch (err) {
-        console.error(err);
-        if (statusText) statusText.innerText = '✕ 上传失败';
       }
     });
   });
