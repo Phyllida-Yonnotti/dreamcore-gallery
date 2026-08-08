@@ -12,7 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/vercel": "^11.0.4",
+    "@astrojs/vercel": "^11.0.5",
     "@vercel/blob": "^2.6.1",
     "astro": "^7.1.4"
   },
