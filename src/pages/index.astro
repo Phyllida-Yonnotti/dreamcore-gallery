@@ -1,142 +1,35 @@
 ---
-// src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
+
+const IMAGE_A_URL = "https://your-blob-store.public.blob.vercel-storage.com/image-a.jpg";
 ---
 
-<Layout title="Is this a dream?">
-  <!-- 🟢 0. 动态虚化全屏背景层 -->
-  <div class="bg-blur-container">
-    <img id="dynamic-bg" class="bg-blur-img" alt="Background Ambiance" />
-    <div class="bg-overlay"></div> <!-- 贴一层遮罩网格，保留原本的复古质感 -->
-  </div>
-
-  <!-- 1. 开场全屏大图遮罩层 -->
-  <div id="splash-screen">
-    <!-- ⚠️ 请替换成你在 Public Blob 存储桶里拿到的真实 CDN 网址 -->
-    <img src="https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/oiTru6Rwtjlsa.png" class="home-subtitle" />
-  </div>
-
-  <!-- 2. 背景音乐 -->
-  <audio id="bgm" src="https://<YOUR-PUBLIC-BLOB>.public.blob.vercel-storage.com/bgm.m4a" loop></audio>
-
-  <div class="dream-text">
-    <img src="https://<YOUR-PUBLIC-BLOB>.public.blob.vercel-storage.com/logo.png" alt="Logo" />
-  </div>
-
-  <!-- 3. 主窗口内容 -->
-  <div class="window-container">
-    <div class="window-header">
-      <span>Memory_Viewer.exe</span>
-      <button class="window-close" id="closeBtn">X</button>
+<!-- 将 Layout 当作标签包裹住页面的具体内容 -->
+<Layout title="Thai Photo Gallery">
+  <div class="app-container">
+    <!-- 图片 A 封面层 -->
+    <div id="splash" class="splash-screen">
+      <img src={IMAGE_A_URL} alt="Splash Image" />
     </div>
-    <div class="window-body">
-      <div class="photo-frame">
-        <div id="gallery-container" class="gallery-grid">
-          <img id="gallery" class="gallery-img" alt="Memory Image" />
-        </div>
-        <div class="photo-caption" id="caption">这是你醒来前看到的最后一幕。</div>
-      </div>
 
-      <div class="nav-buttons">
-        <button class="btn" id="prevBtn">◀ 上一段</button>
-        <button class="btn" id="musicBtn">🎵 播放声音</button>
-        <button class="btn" id="nextBtn">下一段 ▶</button>
+    <!-- 动态模糊背景 -->
+    <div id="bg-blur" class="bg-blur"></div>
+
+    <!-- 居中白色边框相框 -->
+    <div class="gallery-container">
+      <div class="card">
+        <div class="image-wrapper">
+          <img id="main-img" src="" alt="Gallery Image" />
+        </div>
+        <div class="controls">
+          <button id="prev-btn" class="btn" aria-label="Previous">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button id="next-btn" class="btn" aria-label="Next">
+            <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </Layout>
-
-<!-- 客户端交互逻辑 -->
-<script>
-  let memories = [];
-  let currentIndex = 0;
-  let isPlaying = false;
-
-  // 从 API 加载 Blob 里的图片列表
-  async function loadThaiGallery() {
-    try {
-      const response = await fetch('/api/blob-image-upload');
-      const data = await response.json();
-
-      if (data.success && data.images.length > 0) {
-        memories = data.images.map(url => ({ url, text: '这是你醒来前看到的最后一幕。' }));
-        currentIndex = 0;
-        updateMemoryView();
-      }
-    } catch (error) {
-      console.error('加载图片失败:', error);
-    }
-  }
-
-  // 🟢 联动更新相框图片与全屏虚化背景
-  function updateMemoryView() {
-    const imgElement = document.getElementById('gallery') as HTMLImageElement;
-    const bgImgElement = document.getElementById('dynamic-bg') as HTMLImageElement;
-
-    if (memories[currentIndex]) {
-      const currentUrl = memories[currentIndex].url;
-
-      // 切换时的淡隐动画
-      if (imgElement) imgElement.style.opacity = '0.3';
-      if (bgImgElement) bgImgElement.style.opacity = '0.3';
-
-      setTimeout(() => {
-        // 更新相框主图
-        if (imgElement) {
-          imgElement.src = currentUrl;
-          imgElement.style.opacity = '1';
-        }
-
-        // 同步更新全屏虚化背景图
-        if (bgImgElement) {
-          bgImgElement.src = currentUrl;
-          bgImgElement.style.opacity = '1';
-        }
-      }, 150);
-    }
-  }
-
-  // 绑定交互事件
-  document.addEventListener('DOMContentLoaded', () => {
-    loadThaiGallery();
-
-    // 开场遮罩点击关闭
-    document.getElementById('splash-screen')?.addEventListener('click', (e) => {
-      (e.currentTarget as HTMLElement).classList.add('fade-out');
-    });
-
-    // 关闭按钮逻辑
-    document.getElementById('closeBtn')?.addEventListener('click', () => {
-      alert('你无法逃离这里。');
-    });
-
-    // 上一张/下一张切换
-    document.getElementById('prevBtn')?.addEventListener('click', () => {
-      if (!memories.length) return;
-      currentIndex = (currentIndex - 1 + memories.length) % memories.length;
-      updateMemoryView();
-    });
-
-    document.getElementById('nextBtn')?.addEventListener('click', () => {
-      if (!memories.length) return;
-      currentIndex = (currentIndex + 1) % memories.length;
-      updateMemoryView();
-    });
-
-    // 音乐播放/暂停
-    const bgm = document.getElementById('bgm') as HTMLAudioElement;
-    const musicBtn = document.getElementById('musicBtn');
-    musicBtn?.addEventListener('click', () => {
-      if (!isPlaying && bgm) {
-        bgm.play().then(() => {
-          isPlaying = true;
-          musicBtn.innerText = "⏸ 暂停声音";
-        });
-      } else if (bgm) {
-        bgm.pause();
-        isPlaying = false;
-        musicBtn.innerText = "🎵 播放声音";
-      }
-    });
-  });
-</script>
