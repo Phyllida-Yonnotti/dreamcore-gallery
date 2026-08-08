@@ -11,13 +11,20 @@ const nextBtn = document.getElementById('next-btn')!;
 async function fetchImages() {
   try {
     const response = await fetch('/api/images.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     images = await response.json();
 
-    if (images.length > 0) {
+    console.log('加载到的图片列表:', images);
+
+    if (Array.isArray(images) && images.length > 0) {
       updateDisplay(0);
+    } else {
+      console.warn('⚠️ 接口返回的图片列表为空，请检查 Blob 文件夹 prefix 是否匹配');
     }
   } catch (err) {
-    console.error('Failed to load images from Blob:', err);
+    console.error('❌ 无法从 API 加载图片:', err);
   }
 }
 
