@@ -7,25 +7,25 @@
 body, html {
   width: 100%;
   height: 100%;
-  height: 100dvh; /* 移动端适配动态高度 */
+  height: 100dvh;
   overflow: hidden;
   background-color: #000;
   font-family: sans-serif;
 }
 
-/* 全屏容器 */
+/* 全屏容器 - 保证所有元素在屏幕正中间 */
 .app-container {
   position: relative;
   width: 100vw;
   height: 100vh;
-  height: 100dvh; /* 适配手机浏览器地址栏变化 */
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 /* ========================================================
-   图片 A 封面层（Splash Screen）- 铺满高度与平移动画修改
+   图片 A 封面层（Splash Screen）- 向右如重门般平移离场
    ======================================================== */
 .splash-screen {
   position: absolute;
@@ -34,10 +34,9 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* 1. 把背景色改为透明，让后面的画廊能透过镂空展示出来 */
-  background-color: transparent; 
+  background-color: transparent; /* 容器透明 */
   cursor: pointer;
-  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.4s ease-out;
+  transition: transform 3s cubic-bezier(0.22, 1, 0.36, 1), opacity 6s ease-out;
 }
 
 .splash-screen img {
@@ -46,19 +45,17 @@ body, html {
   height: 100dvh;
   object-fit: cover;
   user-select: none;
-  /* 2. 黑科技：滤色模式！自动过滤掉图片中的所有黑色，只保留金黄色栅栏 */
-  mix-blend-mode: screen; 
+  mix-blend-mode: screen; /* 自动过滤黑色背景 */
 }
 
-/* 点击后向右平移 100% 视口宽度离场 */
 .splash-screen.dismissed {
-  transform: translateX(100vw); /* 向右滑出屏幕 */
+  transform: translateX(100vw);
   opacity: 0;
   pointer-events: none;
 }
 
 /* ========================================================
-   背景虚化层与画廊卡片
+   背景虚化层
    ======================================================== */
 .bg-blur {
   position: absolute;
@@ -71,6 +68,9 @@ body, html {
   z-index: 1;
 }
 
+/* ========================================================
+   正中间画廊图片（无白边、固定大小、自动撑满、带阴影）
+   ======================================================== */
 .gallery-container {
   position: relative;
   z-index: 10;
@@ -79,34 +79,38 @@ body, html {
   align-items: center;
 }
 
-/* 白色边框卡片 */
+/* 取消原本的白色相框外壳 */
 .card {
-  background: #ffffff;
-  padding: 16px 16px 20px 16px;
-  border-radius: 8px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  background: transparent; /* 去除白色背景 */
+  padding: 0;              /* 去除内边距边框 */
+  box-shadow: none;        /* 去除卡片阴影 */
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 85vw;
 }
 
+/* 固定大小的图片容器（在手机和电脑上保持固定比例与尺寸） */
 .image-wrapper {
-  width: 60vw;
-  height: 65vh;
+  /* 手机端尺寸 */
+  width: 85vw;
+  height: 55vh;
+  /* 桌面/大屏最大固定尺寸 */
   max-width: 650px;
-  max-height: 550px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  max-height: 480px;
+  
+  border-radius: 12px;      /* 给图片加一点微圆角，质感更好 */
   overflow: hidden;
-  background-color: #f0f0f0;
+  background-color: #1a1a1a; /* 未加载出图片时的默认暗色背景 */
+  
+  /* 精致的阴影效果：让图片从背景中浮现出来 */
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
 }
 
+/* 图片强行撑满固定容器 */
 .image-wrapper img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover; /* 核心：无论图片宽高比例如何，完全填满并等比例裁剪 */
   transition: opacity 0.3s ease;
 }
 
@@ -115,14 +119,14 @@ body, html {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-top: 16px;
-  padding: 0 10px;
+  margin-top: 18px;
+  padding: 0 4px;
 }
 
 .btn {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  color: #333333;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  color: #222222;
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -130,14 +134,15 @@ body, html {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   transition: all 0.2s ease;
   user-select: none;
+  backdrop-filter: blur(4px);
 }
 
 .btn:hover {
-  background: #f8fafc;
-  transform: scale(1.05);
+  background: #ffffff;
+  transform: scale(1.08);
 }
 
 .btn:active {
