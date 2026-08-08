@@ -1,6 +1,9 @@
 import { list } from '@vercel/blob';
 import type { APIRoute } from 'astro';
 
+// 强制此 API 为服务端动态渲染，不进行构建期预渲染
+export const prerender = false;
+
 export const GET: APIRoute = async () => {
   try {
     // 获取 thai/ 文件夹下的所有文件
