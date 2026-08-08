@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro';
 export const GET: APIRoute = async () => {
   try {
     // 读取自定义 Token 或 默认 Token
-    const token = import.meta.env.MY_CUSTOM_BLOB_TOKEN || import.meta.env.BLOB_READ_WRITE_TOKEN;
+    const token = import.meta.env.BLOB_PUBLIC_READ_WRITE_TOKEN || import.meta.env.BLOB_READ_WRITE_TOKEN;
 
     const { blobs } = await list({
       prefix: 'thai/',
