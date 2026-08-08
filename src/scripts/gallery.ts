@@ -10,7 +10,7 @@ const nextBtn = document.getElementById('next-btn')!;
 // 1. 获取 thai 文件夹下的所有图片 URL
 async function fetchImages() {
   try {
-    const response = await fetch('/api/images.json');
+    const response = await fetch('/api/images');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
