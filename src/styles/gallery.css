@@ -158,3 +158,10 @@ body, html {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+
+.subtitle-container {
+  background: transparent;
+  margin-left: 0;
+  margin-right: 0;
+}
