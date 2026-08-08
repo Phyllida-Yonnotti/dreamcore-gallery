@@ -42,20 +42,21 @@ function updateDisplay(index: number, isInitial = false) {
     return;
   }
 
-  // 使用 GSAP 打造更细腻的淡入淡出 + 微微缩放质感
-  gsap.to(mainImg, {
-    opacity: 0.2,
-    scale: 0.96,
-    duration: 0.2,
+  // 💡 将动画对象从 mainImg 改为 '.image-wrapper'
+  // 让整个相框容器（带阴影）一起微微缩小，就不会在内部露出黑框了
+  gsap.to('.image-wrapper', {
+    opacity: 0.4,
+    scale: 0.95,
+    duration: 0.18,
     ease: 'power1.out',
     onComplete: () => {
       mainImg.src = currentUrl;
       bgBlur.style.backgroundImage = `url('${currentUrl}')`;
 
-      gsap.to(mainImg, {
+      gsap.to('.image-wrapper', {
         opacity: 1,
         scale: 1,
-        duration: 0.35,
+        duration: 0.3,
         ease: 'power2.out'
       });
     }
