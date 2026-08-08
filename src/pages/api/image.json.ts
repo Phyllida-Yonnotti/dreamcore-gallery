@@ -1,34 +1,40 @@
 import { list } from '@vercel/blob';
 import type { APIRoute } from 'astro';
 
-// 强制此 API 为服务端动态渲染，不进行构建期预渲染
-export const prerender = false;
+export const prerender = false; // 确保是 SSR 动态渲染
 
 export const GET: APIRoute = async () => {
   try {
-    // 在这里显式传入 token 参数，使用 import.meta.env 读取你的自定义变量
-    const token = import.meta.env.BLOB_PUBLIC_WEBHOOK_PUBLIC_KEY;
+    // 1. 获取 Token（优先读取自定义 Token，若无则读取默认 Token）
+    const token = import.meta.env.MY_CUSTOM_BLOB_TOKEN || import.meta.env.BLOB_READ_WRITE_TOKEN;
 
-    // 获取 thai/ 文件夹下的所有文件
-    const { blobs } = await list({ prefix: 'thai/' });
-    
-    // 提取图片 URL 列表
+    if (!token) {
+      console.error('❌ 未找到 Vercel Blob Token，请检查环境变量设置');
+      return new Response(JSON.stringify({ error: 'Token missing' }), { status: 500 });
+    }
+
+    // 2. 查询 thai/ 目录下的图片
+    const { blobs } = await list({
+      prefix: 'thai/', // 如果图片没有在 thai/ 文件夹下，可以尝试改成 '' 测试
+      token: token
+    });
+
+    // 3. 过滤出图片格式
     const imageUrls = blobs
       .map((blob) => blob.url)
       .filter((url) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url));
 
+    console.log(`✅ 成功获取到 ${imageUrls.length} 张图片`);
+
     return new Response(JSON.stringify(imageUrls), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch images' }), {
+  } catch (error: any) {
+    console.error('❌ 获取 Blob 列表失败:', error?.message || error);
+    return new Response(JSON.stringify({ error: error?.message || 'Failed to fetch images' }), {
       status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 };
