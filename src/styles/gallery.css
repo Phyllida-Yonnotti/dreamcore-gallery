@@ -7,6 +7,7 @@
 body, html {
   width: 100%;
   height: 100%;
+  height: 100dvh; /* 移动端适配动态高度 */
   overflow: hidden;
   background-color: #000;
   font-family: sans-serif;
@@ -17,12 +18,15 @@ body, html {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh; /* 适配手机浏览器地址栏变化 */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* 图片 A 遮罩层 */
+/* ========================================================
+   图片 A 封面层（Splash Screen）- 铺满高度与平移动画修改
+   ======================================================== */
 .splash-screen {
   position: absolute;
   inset: 0;
@@ -30,26 +34,32 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #000;
+  /* 1. 把背景色改为透明，让后面的画廊能透过镂空展示出来 */
+  background-color: transparent; 
   cursor: pointer;
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.4s ease-out;
 }
 
 .splash-screen img {
-  max-width: 90vw;
-  max-height: 90vh;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  object-fit: cover;
   user-select: none;
+  /* 2. 黑科技：滤色模式！自动过滤掉图片中的所有黑色，只保留金黄色栅栏 */
+  mix-blend-mode: screen; 
 }
 
-/* 点击后的平移淡出类 */
+/* 点击后向右平移 100% 视口宽度离场 */
 .splash-screen.dismissed {
-  transform: translateY(-80px);
+  transform: translateX(100vw); /* 向右滑出屏幕 */
   opacity: 0;
   pointer-events: none;
 }
 
-/* 背景虚化层 */
+/* ========================================================
+   背景虚化层与画廊卡片
+   ======================================================== */
 .bg-blur {
   position: absolute;
   inset: -20px;
@@ -61,7 +71,6 @@ body, html {
   z-index: 1;
 }
 
-/* 正中间相框容器 */
 .gallery-container {
   position: relative;
   z-index: 10;
