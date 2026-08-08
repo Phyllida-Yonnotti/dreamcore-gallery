@@ -15,7 +15,7 @@ export const GET: APIRoute = async () => {
 
     // 2. 查询 thai/ 目录下的图片
     const { blobs } = await list({
-      prefix: 'thai/', // 如果图片没有在 thai/ 文件夹下，可以尝试改成 '' 测试
+      prefix: '', // 如果图片没有在 thai/ 文件夹下，可以尝试改成 '' 测试
       token: token
     });
 
