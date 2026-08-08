@@ -104,3 +104,51 @@ prevBtn.addEventListener('click', () => updateDisplay(currentIndex - 1));
 nextBtn.addEventListener('click', () => updateDisplay(currentIndex + 1));
 
 fetchImages();
+
+// 点赞按钮
+const likeCheckbox = document.getElementById('like-checkbox') as HTMLInputElement;
+const likeCountEl = document.getElementById('like-count')!;
+
+// 获取当前总点赞数
+async function fetchLikes() {
+  try {
+    const res = await fetch('/api/likes');
+    const data = await res.json();
+    if (data.count !== undefined) {
+      likeCountEl.textContent = data.count.toString();
+    }
+  } catch (err) {
+    console.error('获取点赞数失败:', err);
+  }
+}
+
+// 触发点赞并递增
+async function handleLike() {
+  // 临时先让数字 +1，提升前台响应感
+  const currentCount = parseInt(likeCountEl.textContent || '0', 10);
+  likeCountEl.textContent = (currentCount + 1).toString();
+
+  try {
+    const res = await fetch('/api/likes', { method: 'POST' });
+    const data = await res.json();
+    if (data.count !== undefined) {
+      likeCountEl.textContent = data.count.toString();
+    }
+  } catch (err) {
+    console.error('点赞请求失败:', err);
+  }
+
+  // 1.2秒后恢复复选框状态，允许用户再次点赞
+  setTimeout(() => {
+    if (likeCheckbox) likeCheckbox.checked = false;
+  }, 1200);
+}
+
+likeCheckbox?.addEventListener('change', (e) => {
+  if ((e.target as HTMLInputElement).checked) {
+    handleLike();
+  }
+});
+
+// 初始化时拉取点赞数
+fetchLikes();
