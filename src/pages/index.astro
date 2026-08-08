@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 
 const IMAGE_A_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/dfa5RplDdfaAgd.png";
+const SUBTITLE_TEXT_URL = "hhttps://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/oiTru6Rwtjlsa.png"; 
 ---
 
 <!-- 将 Layout 当作标签包裹住页面的具体内容 -->
@@ -17,7 +18,7 @@ const IMAGE_A_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/par
 
     <!-- subtitle -->
     <div class="subtitle-container">
-      <img src="https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/oiTru6Rwtjlsa.png" alt="subtitle" />
+      <img src={SUBTITLE_TEXT_URL} alt="subtitle" />
     </div>
     
     <!-- 居中照片 -->
