@@ -183,4 +183,41 @@ const { title = "Is this a dream?" } = Astro.props;
     color: #888;
     margin-bottom: 10px;
   }
+  
+  <!-- 全屏背景虚化样式 -->
+  /* 动态模糊背景容器 */
+  .bg-blur-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2; /* 放在所有内容最底层 */
+    overflow: hidden;
+    background-color: #000000;
+  }
+
+  /* 背景图片高斯模糊 */
+  .bg-blur-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* 核心属性：模糊 35px，降暗亮度 0.35 以保证前端窗口与文字清晰可见 */
+    filter: blur(35px) brightness(0.35) saturate(1.2);
+    /* 核心属性：放大 1.15 倍，消除高斯模糊边缘产生的黑边/白边 */
+    transform: scale(1.15);
+    transition: opacity 0.5s ease, filter 0.5s ease;
+    opacity: 0;
+  }
+
+  /* 叠加暗色暗纹遮罩，保持整体的复古 Dreamcore 气氛 */
+  .bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+  }
 </style>
