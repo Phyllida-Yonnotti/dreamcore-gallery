@@ -4,7 +4,8 @@
   padding: 0;
 }
 
-body, html {
+body,
+html {
   width: 100%;
   height: 100%;
   height: 100dvh;
@@ -36,7 +37,8 @@ body, html {
   align-items: center;
   background-color: transparent;
   cursor: pointer;
-  will-change: transform, opacity; /* 硬件加速提升流畅度 */
+  will-change: transform, opacity;
+  /* 硬件加速提升流畅度 */
 }
 
 .splash-screen img {
@@ -45,7 +47,8 @@ body, html {
   height: 100dvh;
   object-fit: cover;
   user-select: none;
-  mix-blend-mode: screen; /* 过滤黑色背景 */
+  mix-blend-mode: screen;
+  /* 过滤黑色背景 */
 }
 
 /* ========================================================
@@ -60,7 +63,8 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none; /* 穿透点击 */
+  pointer-events: none;
+  /* 穿透点击 */
   background: transparent;
 }
 
@@ -75,15 +79,19 @@ body, html {
 /* ========================================================
    背景虚化层
    ======================================================== */
+/* ========================================================
+   复古花砖质感背景（压暗+微缩+轻微模糊）
+   ======================================================== */
 .bg-blur {
   position: absolute;
-  inset: -20px;
-  background-size: cover;
-  background-position: center;
-  filter: blur(0px) brightness(0.3);
-  transform: scale(1.1);
-  /* transition: background-image 0.5s ease; 👈 可以删掉这行 */
+  inset: 0;
   z-index: 1;
+  
+  /* 2. 核心黑科技：大幅压暗亮度 + 稍加轻微模糊，让花纹变成高级暗纹 */
+  filter: brightness(0.22) contrast(0.85) blur(1.5px);
+  
+  /* 3. 避免边缘白边 */
+  transform: scale(1.02);
 }
 
 /* ========================================================
@@ -113,7 +121,8 @@ body, html {
   max-height: 480px;
   border-radius: 12px;
   overflow: hidden;
-  background-color: transparent; /* 👈 将 #1a1a1a 改为 transparent */
+  background-color: transparent;
+  /* 👈 将 #1a1a1a 改为 transparent */
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
   will-change: transform, opacity;
 }
@@ -125,51 +134,54 @@ body, html {
 }
 
 
-/* controls 居中布局 */
+/* ========================================================
+   控制区域布局与统一高度控制
+   ======================================================== */
 .controls {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  /* 顶部对齐：保证左右箭头与爱心图标对齐，数字顺延留在下方 */
   width: 100%;
   margin-top: 18px;
   padding: 0 12px;
+
+  /* 💡 统一图标高度控制：修改此数值即可同时改变左右箭头和爱心的大小 */
+  --icon-height: 38px;
 }
 
-
+/* PNG 按钮基础重置与高度绑定 */
 .btn {
-  background: rgba(255, 255, 255, 0.9);
+  background: transparent;  /* 移除原有的白圈背景 */
   border: none;
-  color: #222222;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  padding: 0;
+  height: var(--icon-height); /* 强制高度与爱心一致 */
+  width: auto;               /* 宽度按 PNG 图片比例自动自适应 */
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  transition: all 0.2s ease;
+  box-shadow: none;          /* 移除按钮阴影 */
+  transition: transform 0.2s ease, filter 0.2s ease;
   user-select: none;
-  backdrop-filter: blur(4px);
 }
 
 .btn:hover {
-  background: #ffffff;
-  transform: scale(1.08);
+  background: transparent;
+  transform: scale(1.12);    /* 悬停微放大 */
+  filter: brightness(1.2);   /* 悬停微微亮起 */
 }
 
 .btn:active {
-  transform: scale(0.95);
+  transform: scale(0.92);    /* 点击微按压 */
 }
 
-.btn svg {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+/* 按钮内部 PNG 图片填充设置 */
+.btn img {
+  height: 100%;             /* 撑满按钮设置的高度 */
+  width: auto;              /* 保持原图宽高比，不拉伸 */
+  object-fit: contain;
+  pointer-events: none;
 }
 
 /* 爱心+数字的外层包装器 */
@@ -191,11 +203,22 @@ body, html {
 /* ========================================================
    From Uiverse.io by catraco (爱心动画样式)
    ======================================================== */
+/* 爱心+数字外层包装 */
+.heart-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 爱心图标容器：高度与变量绑定 */
 .heart-container {
   --heart-color: rgb(255, 91, 137);
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: var(--icon-height);
+  /* 强制同高同宽 */
+  height: var(--icon-height);
+  /* 强制同高同宽 */
   transition: .3s;
 }
 
@@ -237,22 +260,42 @@ body, html {
   stroke-width: 2px;
 }
 
-.heart-container .checkbox:checked ~ .svg-container .svg-filled {
+.heart-container .checkbox:checked~.svg-container .svg-filled {
   display: block;
 }
 
-.heart-container .checkbox:checked ~ .svg-container .svg-celebrate {
+.heart-container .checkbox:checked~.svg-container .svg-celebrate {
   display: block;
 }
 
 @keyframes keyframes-svg-filled {
-  0% { transform: scale(0); }
-  25% { transform: scale(1.2); }
-  50% { transform: scale(1); filter: brightness(1.5); }
+  0% {
+    transform: scale(0);
+  }
+
+  25% {
+    transform: scale(1.2);
+  }
+
+  50% {
+    transform: scale(1);
+    filter: brightness(1.5);
+  }
 }
 
 @keyframes keyframes-svg-celebrate {
-  0% { transform: scale(0); }
-  50% { opacity: 1; filter: brightness(1.5); }
-  100% { transform: scale(1.4); opacity: 0; display: none; }
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+    filter: brightness(1.5);
+  }
+
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+    display: none;
+  }
 }
