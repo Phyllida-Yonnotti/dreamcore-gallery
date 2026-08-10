@@ -71,7 +71,7 @@ html {
 .subtitle-container img {
   width: 100%;
   height: auto;
-  max-height: 15vh;
+  max-height: 20vh;
   object-fit: contain;
   user-select: none;
 }
@@ -79,18 +79,22 @@ html {
 /* ========================================================
    背景虚化层
    ======================================================== */
-/* ========================================================
-   复古花砖质感背景（压暗+微缩+轻微模糊）
-   ======================================================== */
 .bg-blur {
   position: absolute;
   inset: 0;
   z-index: 1;
+
+  /* 1. 宽度撑满屏幕，高度等比例自适应 */
+  background-size: 100% auto; 
   
-  /* 2. 核心黑科技：大幅压暗亮度 + 稍加轻微模糊，让花纹变成高级暗纹 */
-  filter: brightness(0.22) contrast(0.85) blur(1.5px);
+  /* 2. 靠顶对齐、水平居中 */
+  background-position: top center; 
   
-  /* 3. 避免边缘白边 */
+  /* 3. 不重复平铺（如果希望向下延展平铺，可以改成 repeat-y） */
+  background-repeat: no-repeat; 
+
+  /* 压暗 + 微模糊，保证中间画廊照片清晰 */
+  filter: brightness(0.4) contrast(0.85) blur(0.5px);
   transform: scale(1.02);
 }
 
