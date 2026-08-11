@@ -16,6 +16,8 @@ const NEXT_BTN_URL =
 const WORD_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/word.png";
 const LINE_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/line.png";
 const SIGN_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/sign.png";
+const BANNER_MOBILE = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IMG_0068.png";
+const BANNER_DESKTOP = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IMG_0068.png";
 ---
 
 <!-- 将 Layout 当作标签包裹住页面的具体内容 -->
@@ -43,26 +45,9 @@ const SIGN_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/
     </div>
 
     <!-- subtitle -->
-<!--    <div class="subtitle-container">
-      <img src={SUBTITLE_TEXT_URL} alt="subtitle" />
-    </div>-->
-
-    <div class="top-banner-stack">
-      <img
-        src={WORD_URL}
-        class="banner-img layer-1"
-        alt="banner layer 1"
-      />
-      <img
-        src={LINE_URL}
-        class="banner-img layer-2"
-        alt="banner layer 2"
-      />
-      <img
-        src={SIGN_URL}
-        class="banner-img layer-3"
-        alt="banner layer 3"
-      />
+     <div class="top-banner-container">
+      <img src={BANNER_DESKTOP} class="top-banner-img desktop-banner" alt="Top Banner Desktop" />
+      <img src={BANNER_MOBILE} class="top-banner-img mobile-banner" alt="Top Banner Mobile" />
     </div>
 
     <!-- 居中照片 -->

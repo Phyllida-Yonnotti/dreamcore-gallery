@@ -121,7 +121,7 @@ function renderFrame() {
 renderFrame();
 
 // ========================================================
-// 🖱️ 点击水面开场（未准备好时提示等待）
+// 点击水面开场
 // ========================================================
 splash.addEventListener('click', (e: MouseEvent) => {
   // 如果首张图片还没完全下载完毕，不许开场
@@ -156,8 +156,8 @@ splash.addEventListener('click', (e: MouseEvent) => {
     { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 1.1, delay: 0.25, ease: 'power2.out' }
   );
 
-  // 顶部重叠 PNG 堆叠层平滑入场
-  gsap.fromTo('.top-banner-stack',
+  // BANNER平滑入场
+  gsap.fromTo('.top-banner-container',
     { y: -25, opacity: 0 },
     { y: 0, opacity: 1, duration: 1.0, delay: 0.3, ease: 'power2.out' }
   );

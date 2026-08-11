@@ -73,31 +73,6 @@ html {
 }
 
 /* ========================================================
-   手写字 Subtitle 样式
-   ======================================================== */
-.subtitle-container {
-  position: absolute;
-  top: 10%;
-  left: 0;
-  width: 100vw;
-  z-index: 20;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  pointer-events: none;
-  /* 穿透点击 */
-  background: transparent;
-}
-
-.subtitle-container img {
-  width: 100%;
-  height: auto;
-  max-height: 20vh;
-  object-fit: contain;
-  user-select: none;
-}
-
-/* ========================================================
    背景虚化层
    ======================================================== */
 .bg-blur {
@@ -342,55 +317,41 @@ html {
 }
 
 /* ========================================================
-   顶部三层 Z 轴重叠 PNG 堆叠组件
+   顶部Banner
    ======================================================== */
-.top-banner-stack {
+.top-banner-container {
   position: absolute;
-  top: 4%;
-  width: 100vw;
-  height: 70px;
-  max-width: none !important;
+  top: 2.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  /* 💡 宽度设为 96vw（最大 1050px），确保比画廊照片 (max-width: 850px) 宽一截 */
+  width: 96vw;
+  max-width: 1050px;
+  height: 80px;
+  
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 15;
-  perspective: 1000px;
   pointer-events: none;
 }
 
-.banner-img {
-  position: absolute;
+.top-banner-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   user-select: none;
-  transition: transform 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
 }
 
-/* sign */
-.banner-img.layer-1 {
-  z-index: 1;
-  transform: translateY(-16px) scale(0.92) translateZ(-40px);
-  opacity: 1;
+/* 💻 默认展示桌面端图片，隐藏手机端 */
+.desktop-banner {
+  display: block;
 }
-
-/* line */
-.banner-img.layer-2 {
-  z-index: 2;
-  width: clamp(350px, 95vw, 120%); 
-  left: 50%;
-  transform: translateX(-50%) translateY(-8px) translateZ(-20px);
-  opacity: 1;
+.mobile-banner {
+  display: none;
 }
-
-
-/* word */
-.banner-img.layer-3 {
-  z-index: 3;
-  transform: translateY(0px) scale(1) translateZ(0px);
-  opacity: 1;
-}
-
 
 /* ========================================================
    手机端 (屏幕宽度 <= 768px)
@@ -419,19 +380,20 @@ html {
     display: none !important;
   }
 
-  .top-banner-stack {
-    top: 5%;
-    width: 92vw;
-    height: 65px;
+    .top-banner-container {
+    top: 3%;
+    width: 96vw;
+    height: 60px;
   }
 
-  .banner-img.layer-1 {
-    transform: translateY(-10px) scale(0.93);
+  /* 隐藏桌面图，显示手机图 */
+  .desktop-banner {
+    display: none;
+  }
+  .mobile-banner {
+    display: block;
   }
 
-  .banner-img.layer-2 {
-    transform: translateY(-5px) scale(0.97);
-  }
 }
 
 /* ========================================================
