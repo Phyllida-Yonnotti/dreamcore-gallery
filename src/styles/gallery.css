@@ -83,19 +83,38 @@ html {
   position: absolute;
   inset: 0;
   z-index: 1;
-
-  /* 1. 宽度撑满屏幕，高度等比例自适应 */
-  background-size: 100% auto; 
-  
-  /* 2. 靠顶对齐、水平居中 */
-  background-position: top center; 
-  
-  /* 3. 不重复平铺（如果希望向下延展平铺，可以改成 repeat-y） */
-  background-repeat: no-repeat; 
-
   /* 压暗 + 微模糊，保证中间画廊照片清晰 */
   filter: brightness(0.4) contrast(0.85) blur(0.5px);
   transform: scale(1.02);
+
+  /* 默认背景图片 */
+  background-image: var(--bg-desktop);
+  /* 宽度撑满屏幕，高度等比例自适应 */
+  background-size: 100% auto; 
+  background-position: top center; 
+  background-repeat: no-repeat; 
+}
+
+/* ========================================================
+   手机端 (屏幕宽度 <= 768px)
+   ======================================================== */
+@media (max-width: 768px) {
+  .bg-blur {
+    background-image: var(--bg-mobile);
+    background-size: cover;
+    background-position: center bottom;
+  }
+}
+
+/* ========================================================
+   平板端 (屏幕宽度在 769px 到 1024px 之间，可选)
+   ======================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .bg-blur {
+    background-image: var(--bg-mobile);
+    background-size: cover;
+    background-position: center;
+  }
 }
 
 /* ========================================================
