@@ -10,7 +10,6 @@ const mainImg = document.getElementById('main-img') as HTMLImageElement;
 const prevBtn = document.getElementById('prev-btn')!;
 const nextBtn = document.getElementById('next-btn')!;
 const subtitle = document.querySelector('.subtitle-container') as HTMLElement;
-const galleryContainer = document.querySelector('.gallery-container') as HTMLElement;
 
 // ========================================================
 // 🪶 微羽级水光涟漪引擎
@@ -119,7 +118,7 @@ function renderFrame() {
 renderFrame();
 
 // ========================================================
-// 🖱️ 点击水面：灵动触碰 + 优雅开场
+// 🖱️ 点击水面开场
 // ========================================================
 splash.addEventListener('click', (e: MouseEvent) => {
   if (isOpening) return;
@@ -144,7 +143,7 @@ splash.addEventListener('click', (e: MouseEvent) => {
   });
 
   gsap.fromTo('.image-wrapper', 
-    { scale: 0.92, opacity: 0, filter: 'blur(6px)' },
+    { scale: 0.95, opacity: 0, filter: 'blur(6px)' },
     { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 1.1, delay: 0.25, ease: 'power2.out' }
   );
 
@@ -157,7 +156,7 @@ splash.addEventListener('click', (e: MouseEvent) => {
 });
 
 // ========================================================
-// 画廊 API 与动态上下滑动切换逻辑
+// 🎨 画廊 API 与双端差异化切换逻辑
 // ========================================================
 async function fetchImages() {
   try {
@@ -185,14 +184,17 @@ function preloadAdjacentImages() {
 }
 
 /**
- * 切换图片并播放垂直滑动动画
- * @param index 目标图片索引
- * @param isInitial 是否是初次加载
- * @param direction 'next' (向上滑动/后一张) | 'prev' (向下滑动/前一张)
+ * 切换图片显示
+ * @param isMobileSwipe 是否来源于手机滑动手势
+ * @param direction 手势方向
  */
-function updateDisplay(index: number, isInitial = false, direction: 'next' | 'prev' = 'next') {
-  if (images.length === 0) return;
-  
+function updateDisplay(
+  index: number, 
+  isInitial = false, 
+  isMobileSwipe = false, 
+  direction: 'next' | 'prev' = 'next'
+) {
+  if (images.length === 0) return;  
   currentIndex = (index + images.length) % images.length;
   const currentUrl = images[currentIndex];
 
@@ -202,49 +204,66 @@ function updateDisplay(index: number, isInitial = false, direction: 'next' | 'pr
     return;
   }
 
-  // 根据方向决定滑出与滑入的偏移距离
-  const exitY = direction === 'next' ? -60 : 60;  // next: 向上推出；prev: 向下推出
-  const enterY = direction === 'next' ? 60 : -60; // next: 从下钻出；prev: 从上钻出
+  if (isMobileSwipe) {
+    // 📱 手机端：适度的垂直流动滑入
+    const exitY = direction === 'next' ? -30 : 30;
+    const enterY = direction === 'next' ? 30 : -30;
 
-  gsap.to('.image-wrapper', {
-    opacity: 0,
-    y: exitY,
-    scale: 0.94,
-    duration: 0.2,
-    ease: 'power1.in',
-    onComplete: () => {
-      mainImg.src = currentUrl;
+    gsap.to('.image-wrapper', {
+      opacity: 0,
+      y: exitY,
+      duration: 0.16,
+      ease: 'power1.in',
+      onComplete: () => {
+        mainImg.src = currentUrl;
+        gsap.fromTo('.image-wrapper',
+          { opacity: 0, y: enterY },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.28,
+            ease: 'power2.out',
+            onComplete: () => preloadAdjacentImages()
+          }
+        );
+      }
+    });
+  } else {
+    // 💻 桌面端：极简微拉伸与虚化淡入（无大幅度位移，柔和高级）
+    gsap.to('.image-wrapper', {
+      opacity: 0.3,
+      scale: 0.98,
+      duration: 0.15,
+      ease: 'power1.out',
+      onComplete: () => {
+        mainImg.src = currentUrl;
 
-      gsap.fromTo('.image-wrapper',
-        { opacity: 0, y: enterY, scale: 0.94 },
-        {
+        gsap.to('.image-wrapper', {
           opacity: 1,
-          y: 0,
           scale: 1,
-          duration: 0.35,
+          duration: 0.25,
           ease: 'power2.out',
           onComplete: () => preloadAdjacentImages()
-        }
-      );
-    }
-  });
+        });
+      }
+    });
+  }
 }
 
-// 按钮点击处理
-prevBtn.addEventListener('click', () => updateDisplay(currentIndex - 1, false, 'prev'));
-nextBtn.addEventListener('click', () => updateDisplay(currentIndex + 1, false, 'next'));
+// 桌面端点击按钮（只传入桌面切换逻辑）
+prevBtn.addEventListener('click', () => updateDisplay(currentIndex - 1, false, false, 'prev'));
+nextBtn.addEventListener('click', () => updateDisplay(currentIndex + 1, false, false, 'next'));
 
 // ========================================================
-// 📱 手机端：上下滑动 (Vertical Touch Swipe) 监听
+// 📱 手机端：上下滑动手势监听
 // ========================================================
 let touchStartY = 0;
 let touchStartX = 0;
 let touchEndY = 0;
 let touchEndX = 0;
 
-// 监听整个 window 或图片区域，开场屏结束后生效
 window.addEventListener('touchstart', (e: TouchEvent) => {
-  if (!isOpening) return; // 未开场时不触发滑图
+  if (!isOpening) return;
   touchStartY = e.changedTouches[0].clientY;
   touchStartX = e.changedTouches[0].clientX;
 }, { passive: true });
@@ -257,18 +276,17 @@ window.addEventListener('touchend', (e: TouchEvent) => {
 }, { passive: true });
 
 function handleSwipeGesture() {
-  const deltaY = touchStartY - touchEndY; // > 0 说明向上滑动，< 0 说明向下滑动
+  const deltaY = touchStartY - touchEndY;
   const deltaX = Math.abs(touchStartX - touchEndX);
-  const minSwipeDistance = 45; // 触发切换的最小滑动距离 (px)
+  const minSwipeDistance = 40;
 
-  // 确保主方向是纵向滑动（防止左右误触）
   if (Math.abs(deltaY) > minSwipeDistance && Math.abs(deltaY) > deltaX) {
     if (deltaY > 0) {
-      // 向上滑动 -> 下一张 (next)
-      updateDisplay(currentIndex + 1, false, 'next');
+      // 向上滑动 -> 下一张
+      updateDisplay(currentIndex + 1, false, true, 'next');
     } else {
-      // 向下滑动 -> 上一张 (prev)
-      updateDisplay(currentIndex - 1, false, 'prev');
+      // 向下滑动 -> 上一张
+      updateDisplay(currentIndex - 1, false, true, 'prev');
     }
   }
 }

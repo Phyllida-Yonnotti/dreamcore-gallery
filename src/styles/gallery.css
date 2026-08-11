@@ -125,6 +125,14 @@ html {
     background-size: cover;
     background-position: center top;
   }
+
+  /* 手机端隐藏左右切换按钮，让爱心自动居中 */
+  .controls {
+    justify-content: center;
+  }
+  .btn {
+    display: none !important;
+  }
 }
 
 /* ========================================================
@@ -220,12 +228,19 @@ html {
   transform: scale(0.92);    /* 点击微按压 */
 }
 
-/* 按钮内部 PNG 图片填充设置 */
 .btn img {
-  height: 100%;             /* 撑满按钮设置的高度 */
-  width: auto;              /* 保持原图宽高比，不拉伸 */
+  height: 100%;
+  width: auto;
   object-fit: contain;
   pointer-events: none;
+  
+  /* 左右按键：纯白 + 半透明 */
+  filter: brightness(0) invert(1) opacity(0.65);
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.btn:hover img {
+  filter: brightness(0) invert(1) opacity(1);
 }
 
 /* 爱心+数字的外层包装器 */
