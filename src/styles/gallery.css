@@ -12,6 +12,8 @@ html {
   overflow: hidden;
   background-color: #000;
   font-family: sans-serif;
+  /* 阻止手机页面随手势上下橡皮筋回弹/刷新 */
+  overscroll-behavior-y: none;
 }
 
 /* 全屏容器 */
@@ -26,7 +28,7 @@ html {
 }
 
 /* ========================================================
-   图片 A 封面层（Splash Screen）- 由 GSAP 接管动画
+   轻盈透光水膜开场屏
    ======================================================== */
 .splash-screen {
   position: absolute;
@@ -35,20 +37,39 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: transparent;
+  
+  /* 💡 核心修改：改为半透明深色 + 毛玻璃模糊，透出背后的复古壁纸 */
+  background: rgba(12, 16, 22, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  
   cursor: pointer;
-  will-change: transform, opacity;
-  /* 硬件加速提升流畅度 */
+  overflow: hidden;
 }
 
-.splash-screen img {
+#water-canvas {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  height: 100dvh;
-  object-fit: cover;
-  user-select: none;
-  mix-blend-mode: screen;
-  /* 过滤黑色背景 */
+}
+
+.splash-hint {
+  position: absolute;
+  bottom: 12%;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+  letter-spacing: 5px;
+  font-weight: 300;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 10;
+  animation: splashPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes splashPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.98); }
+  50% { opacity: 0.85; transform: scale(1.03); }
 }
 
 /* ========================================================
@@ -102,7 +123,7 @@ html {
   .bg-blur {
     background-image: var(--bg-mobile);
     background-size: cover;
-    background-position: center bottom;
+    background-position: center top;
   }
 }
 
