@@ -38,9 +38,9 @@ html {
   justify-content: center;
   align-items: center;
   
-  /* 💡 核心修改：改为半透明深色 + 毛玻璃模糊，透出背后的复古壁纸 */
-  background: rgba(12, 16, 22, 0.55);
-  backdrop-filter: blur(16px);
+  /* 半透明深色 + 毛玻璃模糊，透出背后的复古壁纸 */
+  background: rgba(12, 16, 22, 0.60);
+  backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(16px);
   
   cursor: pointer;
@@ -117,36 +117,6 @@ html {
 }
 
 /* ========================================================
-   手机端 (屏幕宽度 <= 768px)
-   ======================================================== */
-@media (max-width: 768px) {
-  .bg-blur {
-    background-image: var(--bg-mobile);
-    background-size: cover;
-    background-position: center top;
-  }
-
-  /* 手机端隐藏左右切换按钮，让爱心自动居中 */
-  .controls {
-    justify-content: center;
-  }
-  .btn {
-    display: none !important;
-  }
-}
-
-/* ========================================================
-   平板端 (屏幕宽度在 769px 到 1024px 之间，可选)
-   ======================================================== */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .bg-blur {
-    background-image: var(--bg-mobile);
-    background-size: cover;
-    background-position: center;
-  }
-}
-
-/* ========================================================
    正中间画廊照片
    ======================================================== */
 .gallery-container {
@@ -167,16 +137,28 @@ html {
 }
 
 .image-wrapper {
-  width: 85vw;
-  height: 55vh;
-  max-width: 650px;
-  max-height: 480px;
-  border-radius: 12px;
+  /* 屏幕占用比例 */
+  width: 90vw;
+  height: 54vh;
+  
+  /* 最大像素上限 */
+  max-width: 880px;
+  max-height: 520px;
+  
+  border-radius: 14px;
   overflow: hidden;
-  background-color: transparent;
-  /* 👈 将 #1a1a1a 改为 transparent */
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
   will-change: transform, opacity;
+
+  /* 骨架屏占位底色与渐变动画 */
+  background: linear-gradient(90deg, #12161f 25%, #1e2533 50%, #12161f 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 2s infinite ease-in-out;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .image-wrapper img {
@@ -356,5 +338,109 @@ html {
     transform: scale(1.4);
     opacity: 0;
     display: none;
+  }
+}
+
+/* ========================================================
+   顶部三层 Z 轴重叠 PNG 堆叠组件
+   ======================================================== */
+.top-banner-stack {
+  position: absolute;
+  top: 4%;
+  width: 100vw;
+  height: 70px;
+  max-width: none !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 15;
+  perspective: 1000px;
+  pointer-events: none;
+}
+
+.banner-img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  transition: transform 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
+}
+
+/* sign */
+.banner-img.layer-1 {
+  z-index: 1;
+  transform: translateY(-16px) scale(0.92) translateZ(-40px);
+  opacity: 1;
+}
+
+/* line */
+.banner-img.layer-2 {
+  z-index: 2;
+  width: clamp(350px, 95vw, 120%); 
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px) translateZ(-20px);
+  opacity: 1;
+}
+
+
+/* word */
+.banner-img.layer-3 {
+  z-index: 3;
+  transform: translateY(0px) scale(1) translateZ(0px);
+  opacity: 1;
+}
+
+
+/* ========================================================
+   手机端 (屏幕宽度 <= 768px)
+   ======================================================== */
+@media (max-width: 768px) {
+  .bg-blur {
+    background-image: var(--bg-mobile);
+    background-size: cover;
+    background-position: center top;
+  }
+
+  /* 手机端适当放大图片，同时保留底部爱心控件的空间 */
+  .image-wrapper {
+    width: 92vw;
+    height: 62vh;
+    max-height: 540px;
+  }
+
+  /* 手机端隐藏左右切换按钮，让爱心自动居中 */
+  .controls {
+    justify-content: center;
+    margin-top: 14px;
+  }
+
+  .btn {
+    display: none !important;
+  }
+
+  .top-banner-stack {
+    top: 5%;
+    width: 92vw;
+    height: 65px;
+  }
+
+  .banner-img.layer-1 {
+    transform: translateY(-10px) scale(0.93);
+  }
+
+  .banner-img.layer-2 {
+    transform: translateY(-5px) scale(0.97);
+  }
+}
+
+/* ========================================================
+   平板端 (屏幕宽度在 769px 到 1024px 之间，可选)
+   ======================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .bg-blur {
+    background-image: var(--bg-mobile);
+    background-size: cover;
+    background-position: center;
   }
 }

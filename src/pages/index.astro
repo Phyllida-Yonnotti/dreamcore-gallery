@@ -13,6 +13,9 @@ const PREV_BTN_URL =
   "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/previous-icon.png";
 const NEXT_BTN_URL =
   "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/next-icon.png";
+const WORD_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/word.png";
+const LINE_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/line.png";
+const SIGN_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/sign.png";
 ---
 
 <!-- 将 Layout 当作标签包裹住页面的具体内容 -->
@@ -40,8 +43,26 @@ const NEXT_BTN_URL =
     </div>
 
     <!-- subtitle -->
-    <div class="subtitle-container">
+<!--    <div class="subtitle-container">
       <img src={SUBTITLE_TEXT_URL} alt="subtitle" />
+    </div>-->
+
+    <div class="top-banner-stack">
+      <img
+        src={WORD_URL}
+        class="banner-img layer-1"
+        alt="banner layer 1"
+      />
+      <img
+        src={LINE_URL}
+        class="banner-img layer-2"
+        alt="banner layer 2"
+      />
+      <img
+        src={SIGN_URL}
+        class="banner-img layer-3"
+        alt="banner layer 3"
+      />
     </div>
 
     <!-- 居中照片 -->
