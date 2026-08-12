@@ -389,6 +389,7 @@ html {
   /* 隐藏桌面图，显示手机图 */
   .desktop-banner {
     display: none;
+    width: 100vw;
   }
   .mobile-banner {
     display: block;

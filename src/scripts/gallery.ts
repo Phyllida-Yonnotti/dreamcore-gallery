@@ -15,7 +15,7 @@ const subtitle = document.querySelector('.subtitle-container') as HTMLElement;
 let isReadyToOpen = false; // 标记首张图是否完全加载完成
 
 // ========================================================
-// 🪶 微羽级水光涟漪引擎
+// 水光涟漪引擎
 // ========================================================
 interface WaterRing {
   x: number;
@@ -171,7 +171,7 @@ splash.addEventListener('click', (e: MouseEvent) => {
 });
 
 // ========================================================
-// 🎨 画廊 API 与无缝预加载逻辑
+// 画廊 API 与无缝预加载逻辑
 // ========================================================
 async function fetchImages() {
   try {
@@ -279,7 +279,7 @@ function updateDisplay(
 prevBtn.addEventListener('click', () => updateDisplay(currentIndex - 1, false, false, 'prev'));
 nextBtn.addEventListener('click', () => updateDisplay(currentIndex + 1, false, false, 'next'));
 
-// 📱 手机端：上下滑动
+// 手机端：上下滑动
 let touchStartY = 0;
 let touchStartX = 0;
 let touchEndY = 0;
