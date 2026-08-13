@@ -13,11 +13,16 @@ const PREV_BTN_URL =
   "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/previous-icon.png";
 const NEXT_BTN_URL =
   "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/next-icon.png";
-const WORD_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/word.png";
-const LINE_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/line.png";
-const SIGN_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/sign.png";
-const BANNER_MOBILE = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IMG_0068.png";
-const BANNER_DESKTOP = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IMG_0069.png";
+const WORD_URL =
+  "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/word.png";
+const LINE_URL =
+  "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/line.png";
+const SIGN_URL =
+  "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/sign.png";
+const BANNER_MOBILE =
+  "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IMG_0068.png";
+const BANNER_DESKTOP =
+  "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IMG_0069.png";
 ---
 
 <!-- 将 Layout 当作标签包裹住页面的具体内容 -->
@@ -45,9 +50,17 @@ const BANNER_DESKTOP = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/
     </div>
 
     <!-- subtitle -->
-     <div class="top-banner-container">
-      <img src={BANNER_DESKTOP} class="top-banner-img desktop-banner" alt="Top Banner Desktop" />
-      <img src={BANNER_MOBILE} class="top-banner-img mobile-banner" alt="Top Banner Mobile" />
+    <div class="top-banner-container">
+      <img
+        src={BANNER_DESKTOP}
+        class="top-banner-img desktop-banner"
+        alt="Top Banner Desktop"
+      />
+      <img
+        src={BANNER_MOBILE}
+        class="top-banner-img mobile-banner"
+        alt="Top Banner Mobile"
+      />
     </div>
 
     <!-- 居中照片 -->
@@ -56,6 +69,23 @@ const BANNER_DESKTOP = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/
         <div class="image-wrapper">
           <img id="main-img" src="" alt="Gallery Image" loading="eager" />
         </div>
+
+        <!-- 手机端：覆盖在照片边缘的透明 PNG 叶子层 -->
+        <div class="leaf-overlay">
+          <!-- 左侧叶子：覆盖照片左侧边缘 -->
+          <img
+            src="https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/leaf-left.png"
+            class="leaf-item leaf-left"
+            alt="leaf left"
+          />
+          <!-- 右侧叶子：覆盖照片右侧边缘 -->
+          <img
+            src="https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/leaf-right.png"
+            class="leaf-item leaf-right"
+            alt="leaf right"
+          />
+        </div>
+
         <div class="controls">
           <!-- Previous Button -->
           <button id="prev-btn" class="btn" aria-label="Previous">

@@ -313,3 +313,117 @@ function handleSwipeGesture() {
 }
 
 fetchImages();
+
+let isAnimating = false; // 防止滑动太快导致动画叠加卡顿
+
+/**
+ * 核心动画：叶子拨开 -> 图片滑动(正向/反向) -> 叶子弹性复位
+ */
+function updateDisplayWithLeafAnimation(
+  newIndex: number, 
+  direction: 'next' | 'prev'
+) {
+  if (images.length === 0 || isAnimating) return;
+  isAnimating = true;
+
+  currentIndex = (newIndex + images.length) % images.length;
+  const nextImageUrl = images[currentIndex];
+
+  // 方向判断：上滑(next)照片向上飞出/下方切入；下滑(prev)照片向下飞出/上方切入
+  const exitY = direction === 'next' ? -60 : 60;
+  const enterY = direction === 'next' ? 60 : -60;
+
+  // 创建 GSAP 连贯动画时间线
+  const tl = gsap.timeline({
+    onComplete: () => {
+      isAnimating = false;
+      preloadAdjacentImages();
+    }
+  });
+
+  // 阶段 1：两片叶子像被手拨开一样，向两侧旋转开（0.3秒）
+  tl.to('.leaf-left', {
+    rotation: -42,
+    x: '-35%',
+    y: 15,
+    duration: 0.3,
+    ease: 'power2.out'
+  }, 0)
+  .to('.leaf-right', {
+    rotation: 42,
+    x: '35%',
+    y: 15,
+    duration: 0.3,
+    ease: 'power2.out'
+  }, 0);
+
+  // 阶段 2：旧图片随着手势方向滑出（0.2秒）
+  tl.to('.image-wrapper', {
+    y: exitY,
+    opacity: 0.3,
+    duration: 0.2,
+    ease: 'power1.in',
+    onComplete: () => {
+      // 切换新图片地址
+      mainImg.src = nextImageUrl;
+    }
+  }, 0.1);
+
+  // 阶段 3：新图片从反方向滑入就位（0.35秒）
+  tl.fromTo('.image-wrapper', 
+    { y: enterY, opacity: 0.3 },
+    { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' },
+    0.3
+  );
+
+  // 阶段 4：叶子带着自然弹性（back.out）松手回弹复位，重新盖住照片边缘（0.45秒）
+  tl.to('.leaf-left', {
+    rotation: 0,
+    x: '0%',
+    y: 0,
+    duration: 0.45,
+    ease: 'back.out(1.5)'
+  }, 0.35)
+  .to('.leaf-right', {
+    rotation: 0,
+    x: '0%',
+    y: 0,
+    duration: 0.45,
+    ease: 'back.out(1.5)'
+  }, 0.35);
+}
+
+// ========================================================
+// 手机端：手势滑动监听 (上下划)
+// ========================================================
+let touchStartY = 0;
+let touchStartX = 0;
+
+window.addEventListener('touchstart', (e: TouchEvent) => {
+  touchStartY = e.changedTouches[0].clientY;
+  touchStartX = e.changedTouches[0].clientX;
+}, { passive: true });
+
+window.addEventListener('touchend', (e: TouchEvent) => {
+  const touchEndY = e.changedTouches[0].clientY;
+  const touchEndX = e.changedTouches[0].clientX;
+  
+  const deltaY = touchStartY - touchEndY;
+  const deltaX = Math.abs(touchStartX - touchEndX);
+  const minSwipeDistance = 35; // 触发划动的最小距离
+
+  // 确保是垂直方向的划动
+  if (Math.abs(deltaY) > minSwipeDistance && Math.abs(deltaY) > deltaX) {
+    if (deltaY > 0) {
+      // 👆 向上滑动 -> 下一张 (next)
+      updateDisplayWithLeafAnimation(currentIndex + 1, 'next');
+    } else {
+      // 👇 向下滑动 -> 上一张 (prev)
+      updateDisplayWithLeafAnimation(currentIndex - 1, 'prev');
+    }
+  }
+}, { passive: true });
+
+// 桌面端按钮联动（同样享受拨叶动画）
+prevBtn.addEventListener('click', () => updateDisplayWithLeafAnimation(currentIndex - 1, 'prev'));
+nextBtn.addEventListener('click', () => updateDisplayWithLeafAnimation(currentIndex + 1, 'next'));

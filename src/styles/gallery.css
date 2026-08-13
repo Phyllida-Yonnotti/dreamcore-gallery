@@ -37,12 +37,12 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
-  
+
   /* 半透明深色 + 毛玻璃模糊，透出背后的复古壁纸 */
   background: rgba(12, 16, 22, 0.60);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(16px);
-  
+
   cursor: pointer;
   overflow: hidden;
 }
@@ -68,8 +68,17 @@ html {
 }
 
 @keyframes splashPulse {
-  0%, 100% { opacity: 0.3; transform: scale(0.98); }
-  50% { opacity: 0.85; transform: scale(1.03); }
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.98);
+  }
+
+  50% {
+    opacity: 0.85;
+    transform: scale(1.03);
+  }
 }
 
 /* ========================================================
@@ -86,9 +95,9 @@ html {
   /* 默认背景图片 */
   background-image: var(--bg-desktop);
   /* 宽度撑满屏幕，高度等比例自适应 */
-  background-size: 100% auto; 
-  background-position: top center; 
-  background-repeat: no-repeat; 
+  background-size: 100% auto;
+  background-position: top center;
+  background-repeat: no-repeat;
 }
 
 /* ========================================================
@@ -115,11 +124,11 @@ html {
   /* 屏幕占用比例 */
   width: 90vw;
   height: 54vh;
-  
+
   /* 最大像素上限 */
   max-width: 880px;
   max-height: 520px;
-  
+
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
@@ -132,8 +141,13 @@ html {
 }
 
 @keyframes skeletonShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .image-wrapper img {
@@ -161,28 +175,35 @@ html {
 
 /* PNG 按钮基础重置与高度绑定 */
 .btn {
-  background: transparent;  /* 移除原有的白圈背景 */
+  background: transparent;
+  /* 移除原有的白圈背景 */
   border: none;
   padding: 0;
-  height: var(--icon-height); /* 强制高度与爱心一致 */
-  width: auto;               /* 宽度按 PNG 图片比例自动自适应 */
+  height: var(--icon-height);
+  /* 强制高度与爱心一致 */
+  width: auto;
+  /* 宽度按 PNG 图片比例自动自适应 */
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: none;          /* 移除按钮阴影 */
+  box-shadow: none;
+  /* 移除按钮阴影 */
   transition: transform 0.2s ease, filter 0.2s ease;
   user-select: none;
 }
 
 .btn:hover {
   background: transparent;
-  transform: scale(1.12);    /* 悬停微放大 */
-  filter: brightness(1.2);   /* 悬停微微亮起 */
+  transform: scale(1.12);
+  /* 悬停微放大 */
+  filter: brightness(1.2);
+  /* 悬停微微亮起 */
 }
 
 .btn:active {
-  transform: scale(0.92);    /* 点击微按压 */
+  transform: scale(0.92);
+  /* 点击微按压 */
 }
 
 .btn img {
@@ -190,7 +211,7 @@ html {
   width: auto;
   object-fit: contain;
   pointer-events: none;
-  
+
   /* 左右按键：纯白 + 半透明 */
   filter: brightness(0) invert(1) opacity(0.65);
   transition: transform 0.25s ease, filter 0.25s ease;
@@ -212,7 +233,7 @@ html {
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   user-select: none;
 }
 
@@ -324,12 +345,12 @@ html {
   top: 2.5%;
   left: 50%;
   transform: translateX(-50%);
-  
+
   /* 💡 宽度设为 96vw（最大 1050px），确保比画廊照片 (max-width: 850px) 宽一截 */
   width: 96vw;
   max-width: 1050px;
   height: 80px;
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -349,8 +370,51 @@ html {
 .desktop-banner {
   display: block;
 }
+
 .mobile-banner {
   display: none;
+}
+
+/* ========================================================
+   树叶覆盖与拨开动画样式
+   ======================================================== */
+.leaf-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* 穿透点击，不影响手势 */
+  z-index: 25;
+  /* 确保层级高于照片 (.image-wrapper z-index: 10) */
+  display: none;
+  /* 默认桌面端隐藏 */
+}
+
+.leaf-item {
+  position: absolute;
+  user-select: none;
+  will-change: transform;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+}
+
+/* 左侧叶子：贴在左侧，轴心在左下角（拨开时往左下旋转） */
+.leaf-left {
+  left: -8%;
+  top: 15%;
+  width: 38vw;
+  max-width: 180px;
+  transform-origin: bottom left;
+}
+
+/* 右侧叶子：贴在右侧，轴心在右下角（拨开时往右下旋转） */
+.leaf-right {
+  right: -8%;
+  bottom: 22%;
+  width: 42vw;
+  max-width: 200px;
+  transform-origin: bottom right;
 }
 
 /* ========================================================
@@ -380,7 +444,7 @@ html {
     display: none !important;
   }
 
-    .top-banner-container {
+  .top-banner-container {
     top: 3%;
     width: 96vw;
     height: 60px;
@@ -391,10 +455,15 @@ html {
     display: none;
     width: 100vw;
   }
+
   .mobile-banner {
     display: block;
   }
 
+  /* 仅在手机端启用叶子层 */
+  .leaf-overlay {
+    display: block;
+  }
 }
 
 /* ========================================================
