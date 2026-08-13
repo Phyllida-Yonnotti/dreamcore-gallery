@@ -1,0 +1,175 @@
+---
+// src/pages/upload.astro
+---
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>图片上传器 - Thai Directory</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background-color: #0b0f17;
+        color: #e2e8f0;
+        font-family: system-ui, -apple-system, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+      .upload-card {
+        background: #161b26;
+        border: 1px solid #2d3748;
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      }
+      h1 {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: #ffffff;
+      }
+      p.subtitle {
+        font-size: 13px;
+        color: #a0aec0;
+        margin-bottom: 24px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      input[type="file"] {
+        background: #0f131d;
+        border: 1px dashed #4a5568;
+        padding: 14px;
+        border-radius: 8px;
+        color: #a0aec0;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      input[type="file"]:hover {
+        border-color: #718096;
+      }
+      button {
+        background: #3182ce;
+        color: #ffffff;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      button:hover {
+        background: #2b6cb0;
+      }
+      button:disabled {
+        background: #4a5568;
+        cursor: not-allowed;
+      }
+      #status {
+        margin-top: 16px;
+        font-size: 13px;
+        word-break: break-all;
+        line-height: 1.5;
+      }
+      .status-success {
+        color: #48bb78;
+      }
+      .status-error {
+        color: #f56565;
+      }
+      .status-loading {
+        color: #ed8936;
+      }
+      .preview-box {
+        margin-top: 16px;
+        max-height: 200px;
+        overflow: hidden;
+        border-radius: 6px;
+        display: none;
+      }
+      .preview-box img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="upload-card">
+      <h1>上传图片到 thai 目录</h1>
+      <p class="subtitle">选择的图片将保存至 Vercel Blob 的 thai/ 路径下</p>
+
+      <form id="upload-form" class="form-group">
+        <input type="file" id="file-input" accept="image/*" required />
+        <button type="submit" id="submit-btn">开始上传</button>
+      </form>
+
+      <div id="status"></div>
+      <div id="preview" class="preview-box">
+        <img id="preview-img" src="" alt="上传预览" />
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById('upload-form') as HTMLFormElement;
+      const fileInput = document.getElementById('file-input') as HTMLInputElement;
+      const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+      const statusDiv = document.getElementById('status') as HTMLDivElement;
+      const previewBox = document.getElementById('preview') as HTMLDivElement;
+      const previewImg = document.getElementById('preview-img') as HTMLImageElement;
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const file = fileInput.files?.[0];
+        if (!file) return;
+
+        submitBtn.disabled = true;
+        statusDiv.className = 'status-loading';
+        statusDiv.textContent = '文件上传中，请稍候...';
+        previewBox.style.display = 'none';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            statusDiv.className = 'status-success';
+            statusDiv.textContent = '上传成功！';
+            
+            previewImg.src = data.url;
+            previewBox.style.display = 'block';
+            form.reset();
+          } else {
+            throw new Error(data.error || '上传失败');
+          }
+        } catch (err: any) {
+          statusDiv.className = 'status-error';
+          statusDiv.textContent = '错误: ' + err.message;
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
