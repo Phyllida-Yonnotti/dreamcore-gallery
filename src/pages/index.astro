@@ -23,6 +23,8 @@ const BANNER_MOBILE =
   "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IMG_0068.png";
 const BANNER_DESKTOP =
   "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/IMG_0069.png";
+const LEAF_LEFT_01_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/leaf-01.png";
+const LEAF_RIGHT_02_URL = "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/leaf-02.png";
 ---
 
 <!-- 将 Layout 当作标签包裹住页面的具体内容 -->
@@ -74,13 +76,13 @@ const BANNER_DESKTOP =
         <div class="leaf-overlay">
           <!-- 左侧叶子：覆盖照片左侧边缘 -->
           <img
-            src="https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/leaf-left.png"
+            src={LEAF_LEFT_01_URL}
             class="leaf-item leaf-left"
             alt="leaf left"
           />
           <!-- 右侧叶子：覆盖照片右侧边缘 -->
           <img
-            src="https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/leaf-right.png"
+            src={LEAF_RIGHT_02_URL}
             class="leaf-item leaf-right"
             alt="leaf right"
           />
