@@ -1,6 +1,9 @@
 import { put } from '@vercel/blob';
 import type { APIRoute } from 'astro';
 
+// 强制此 API 路径以服务端模式运行，不进行静态预渲染
+export const prerender = false;
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     const formData = await request.formData();

@@ -177,6 +177,9 @@ async function fetchImages() {
   try {
     if (splashHint) splashHint.innerHTML = "静水沉淀中...";
 
+    // 初始化时先隐藏 <img>，露出 CSS 骨架屏动画
+    if (mainImg) mainImg.style.opacity = '0';
+
     const response = await fetch('/api/images');
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     images = await response.json();
@@ -187,6 +190,9 @@ async function fetchImages() {
 
       const onFirstLoad = () => {
         mainImg.src = images[0];
+        // 图片载入完毕后，平滑淡入显示图片
+        gsap.to(mainImg, { opacity: 1, duration: 0.4 });
+
         isReadyToOpen = true;
         if (splashHint) splashHint.innerHTML = "点击静水 · 开启画廊";
         preloadAdjacentImages();
@@ -216,7 +222,7 @@ function preloadAdjacentImages() {
 }
 
 // ========================================================
-// 💻 桌面端：渐隐平滑切图逻辑
+// 桌面端：渐隐平滑切图逻辑
 // ========================================================
 function updateDisplay(
   index: number,
@@ -273,7 +279,7 @@ function updateDisplay(
 }
 
 // ========================================================
-// 🌿 手机端：镜头穿梭 + 四角拨叶切换逻辑
+// 手机端：镜头穿梭 + 四角拨叶切换逻辑
 // ========================================================
 function updateDisplayWithLeafAnimation(
   newIndex: number,
