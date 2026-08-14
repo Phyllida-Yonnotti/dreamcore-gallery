@@ -101,6 +101,14 @@ html {
 }
 
 /* ========================================================
+   桌面端隐藏叶层
+   ======================================================== */
+.leaf-wall-bg,
+.leaf-overlay {
+  display: none !important;
+}
+
+/* ========================================================
    正中间画廊照片
    ======================================================== */
 .gallery-container {
@@ -220,14 +228,6 @@ html {
 
 .btn:hover img {
   filter: brightness(0) invert(1) opacity(1);
-}
-
-/* 爱心+数字的外层包装器 */
-.heart-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
 }
 
 .like-count {
@@ -350,7 +350,7 @@ html {
   /* 宽度设为 96vw（最大 1050px），确保比画廊照片 (max-width: 850px) 宽一截 */
   width: 95vw;
   max-width: 1200px !important;
-  
+
   height: auto;
   max-height: 140px;
 
@@ -470,10 +470,74 @@ html {
   }
 
   /* 仅在手机端启用叶子层 */
+  .leaf-wall-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    /* 替换为你深色叶墙静态图片的 URL */
+    background:
+      radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.75) 100%),
+      url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+    pointer-events: none;
+  }
+
+  .gallery-container {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* 2. 前景树叶覆盖层 */
   .leaf-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 25;
     display: block;
+    overflow: hidden;
+    /* 保证叶子飞出屏幕时不出现滚动条 */
+  }
+
+  .leaf-item {
+    position: absolute;
+    user-select: none;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+  }
+
+  /* 四角树叶分布 */
+  .leaf-tl {
+    top: -4%;
+    left: -10%;
+    width: 45vw;
+    max-width: 200px;
+    transform-origin: top left;
+  }
+
+  .leaf-tr {
+    top: -2%;
+    right: -10%;
+    width: 48vw;
+    max-width: 210px;
+    transform-origin: top right;
+  }
+
+  .leaf-bl {
+    bottom: 12%;
+    left: -12%;
+    width: 50vw;
+    max-width: 220px;
+    transform-origin: bottom left;
+  }
+
+  .leaf-br {
+    bottom: 10%;
+    right: -12%;
+    width: 52vw;
+    max-width: 230px;
+    transform-origin: bottom right;
   }
 }
+
 
 /* ========================================================
    平板端 (屏幕宽度在 769px 到 1024px 之间，可选)

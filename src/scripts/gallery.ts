@@ -13,6 +13,7 @@ const nextBtn = document.getElementById('next-btn')!;
 const subtitle = document.querySelector('.subtitle-container') as HTMLElement;
 
 let isReadyToOpen = false; // 标记首张图是否完全加载完成
+let isAnimating = false;  // 状态锁：防止快速滑动导致动画重叠
 
 // ========================================================
 // 水光涟漪引擎
@@ -124,7 +125,6 @@ renderFrame();
 // 点击水面开场
 // ========================================================
 splash.addEventListener('click', (e: MouseEvent) => {
-  // 如果首张图片还没完全下载完毕，不许开场
   if (!isReadyToOpen) {
     createRipple(e.clientX, e.clientY, false);
     return;
@@ -156,7 +156,7 @@ splash.addEventListener('click', (e: MouseEvent) => {
     { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 1.1, delay: 0.25, ease: 'power2.out' }
   );
 
-  // BANNER平滑入场
+  // BANNER 平滑入场
   gsap.fromTo('.top-banner-container',
     { y: -25, opacity: 0 },
     { y: 0, opacity: 1, duration: 1.0, delay: 0.3, ease: 'power2.out' }
@@ -171,7 +171,7 @@ splash.addEventListener('click', (e: MouseEvent) => {
 });
 
 // ========================================================
-// 画廊 API 与无缝预加载逻辑
+// 画廊 API 与预加载逻辑
 // ========================================================
 async function fetchImages() {
   try {
@@ -182,7 +182,6 @@ async function fetchImages() {
     images = await response.json();
 
     if (Array.isArray(images) && images.length > 0) {
-      // 预加载第一张图，确保加载完才允许开启水面
       const firstImg = new Image();
       firstImg.src = images[0];
 
@@ -216,37 +215,33 @@ function preloadAdjacentImages() {
   imgPrev.src = images[prevIndex];
 }
 
-/**
- * 切换图片：先后台加载，完全就绪后再淡入
- */
+// ========================================================
+// 💻 桌面端：渐隐平滑切图逻辑
+// ========================================================
 function updateDisplay(
   index: number,
   isInitial = false,
-  isMobileSwipe = false,
   direction: 'next' | 'prev' = 'next'
 ) {
-  if (images.length === 0) return;
+  if (images.length === 0 || isAnimating) return;
+  isAnimating = true;
+
   currentIndex = (index + images.length) % images.length;
   const currentUrl = images[currentIndex];
 
   if (isInitial) {
     mainImg.src = currentUrl;
     preloadAdjacentImages();
+    isAnimating = false;
     return;
   }
 
-  // 先旧图淡出
-  const exitY = isMobileSwipe ? (direction === 'next' ? -30 : 30) : 0;
-  const enterY = isMobileSwipe ? (direction === 'next' ? 30 : -30) : 0;
-
   gsap.to('.image-wrapper', {
     opacity: 0.2,
-    y: exitY,
-    scale: isMobileSwipe ? 1 : 0.98,
+    scale: 0.98,
     duration: 0.15,
     ease: 'power1.in',
     onComplete: () => {
-      // 💡 关键：使用内存 Image 对象确保图片下载 100% 完成后再替换主图
       const tempImg = new Image();
       tempImg.src = currentUrl;
 
@@ -254,14 +249,16 @@ function updateDisplay(
         mainImg.src = currentUrl;
 
         gsap.fromTo('.image-wrapper',
-          { opacity: 0.2, y: enterY, scale: isMobileSwipe ? 1 : 0.98 },
+          { opacity: 0.2, scale: 0.98 },
           {
             opacity: 1,
-            y: 0,
             scale: 1,
             duration: 0.28,
             ease: 'power2.out',
-            onComplete: () => preloadAdjacentImages()
+            onComplete: () => {
+              isAnimating = false;
+              preloadAdjacentImages();
+            }
           }
         );
       };
@@ -275,63 +272,9 @@ function updateDisplay(
   });
 }
 
-// 桌面端点击按钮
-prevBtn.addEventListener('click', () => updateDisplay(currentIndex - 1, false, false, 'prev'));
-nextBtn.addEventListener('click', () => updateDisplay(currentIndex + 1, false, false, 'next'));
-
-// 手机端：上下滑动
-let touchStartY = 0;
-let touchStartX = 0;
-let touchEndY = 0;
-let touchEndX = 0;
-
-window.addEventListener('touchstart', (e: TouchEvent) => {
-  if (!isOpening) return;
-  touchStartY = e.changedTouches[0].clientY;
-  touchStartX = e.changedTouches[0].clientX;
-}, { passive: true });
-
-window.addEventListener('touchend', (e: TouchEvent) => {
-  const touchEndY = e.changedTouches[0].clientY;
-  const touchEndX = e.changedTouches[0].clientX;
-
-  const deltaY = touchStartY - touchEndY;
-  const deltaX = Math.abs(touchStartX - touchEndX);
-  const minSwipeDistance = 35; // 触发划动的最小距离
-
-  // 确保是垂直方向的划动
-  if (Math.abs(deltaY) > minSwipeDistance && Math.abs(deltaY) > deltaX) {
-    if (deltaY > 0) {
-      // 向上滑动 -> 下一张 (next)
-      updateDisplayWithLeafAnimation(currentIndex + 1, 'next');
-    } else {
-      // 向下滑动 -> 上一张 (prev)
-      updateDisplayWithLeafAnimation(currentIndex - 1, 'prev');
-    }
-  }
-}, { passive: true });
-
-function handleSwipeGesture() {
-  const deltaY = touchStartY - touchEndY;
-  const deltaX = Math.abs(touchStartX - touchEndX);
-  const minSwipeDistance = 40;
-
-  if (Math.abs(deltaY) > minSwipeDistance && Math.abs(deltaY) > deltaX) {
-    if (deltaY > 0) {
-      updateDisplay(currentIndex + 1, false, true, 'next');
-    } else {
-      updateDisplay(currentIndex - 1, false, true, 'prev');
-    }
-  }
-}
-
-fetchImages();
-
-let isAnimating = false; // 防止滑动太快导致动画叠加卡顿
-
-/**
- * 核心动画：叶子拨开 -> 图片滑动(正向/反向) -> 叶子弹性复位
- */
+// ========================================================
+// 🌿 手机端：镜头穿梭 + 四角拨叶切换逻辑
+// ========================================================
 function updateDisplayWithLeafAnimation(
   newIndex: number,
   direction: 'next' | 'prev'
@@ -342,11 +285,6 @@ function updateDisplayWithLeafAnimation(
   currentIndex = (newIndex + images.length) % images.length;
   const nextImageUrl = images[currentIndex];
 
-  // 方向判断：上滑(next)照片向上飞出/下方切入；下滑(prev)照片向下飞出/上方切入
-  const exitY = direction === 'next' ? -60 : 60;
-  const enterY = direction === 'next' ? 60 : -60;
-
-  // 创建 GSAP 连贯动画时间线
   const tl = gsap.timeline({
     onComplete: () => {
       isAnimating = false;
@@ -354,54 +292,156 @@ function updateDisplayWithLeafAnimation(
     }
   });
 
-  // 阶段 1：两片叶子像被手拨开一样，向两侧旋转开（0.3秒）
-  tl.to('.leaf-left', {
-    rotation: -42,
-    x: '-35%',
-    y: 15,
-    duration: 0.3,
-    ease: 'power2.out'
-  }, 0)
-    .to('.leaf-right', {
-      rotation: 42,
-      x: '35%',
-      y: 15,
-      duration: 0.3,
-      ease: 'power2.out'
-    }, 0);
+  if (direction === 'next') {
+    // 🚀 向上滑动 / 下一张：镜头【前进】
+    // 1. 树叶向四周爆开飞掠并放大 (模拟拂过眼前)
+    tl.to('.leaf-tl', { x: '-60%', y: '-60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
+      .to('.leaf-tr', { x: '60%', y: '-60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
+      .to('.leaf-bl', { x: '-60%', y: '60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
+      .to('.leaf-br', { x: '60%', y: '60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0);
 
-  // 阶段 2：旧图片随着手势方向滑出（0.2秒）
-  tl.to('.image-wrapper', {
-    y: exitY,
-    opacity: 0.3,
-    duration: 0.2,
-    ease: 'power1.in',
-    onComplete: () => {
-      // 切换新图片地址
-      mainImg.src = nextImageUrl;
-    }
-  }, 0.1);
+    // 2. 照片向前推进拉近 (Scale 1.0 -> 1.08)
+    tl.to('.image-wrapper', {
+      scale: 1.08,
+      opacity: 0.2,
+      duration: 0.25,
+      ease: 'power1.in',
+      onComplete: () => { mainImg.src = nextImageUrl; }
+    }, 0.05);
 
-  // 阶段 3：新图片从反方向滑入就位（0.35秒）
-  tl.fromTo('.image-wrapper',
-    { y: enterY, opacity: 0.3 },
-    { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' },
-    0.3
-  );
+    // 3. 新照片从深处拉近就位
+    tl.fromTo('.image-wrapper', 
+      { scale: 0.92, opacity: 0.2 },
+      { scale: 1, opacity: 1, duration: 0.35, ease: 'power2.out' },
+      0.3
+    );
 
-  // 阶段 4：叶子带着自然弹性（back.out）松手回弹复位，重新盖住照片边缘（0.45秒）
-  tl.to('.leaf-left', {
-    rotation: 0,
-    x: '0%',
-    y: 0,
-    duration: 0.45,
-    ease: 'back.out(1.5)'
-  }, 0.35)
-    .to('.leaf-right', {
-      rotation: 0,
-      x: '0%',
-      y: 0,
-      duration: 0.45,
-      ease: 'back.out(1.5)'
-    }, 0.35);
+    // 4. 新树叶在前屏悄然淡入凝结 (模拟进入下一层叶丛)
+    tl.fromTo('.leaf-item',
+      { x: '0%', y: '0%', scale: 0.8, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.45, ease: 'back.out(1.2)', stagger: 0.03 },
+      0.35
+    );
+
+  } else {
+    // ⏪ 向下滑动 / 上一张：镜头【后退】
+    // 1. 当前树叶向内散开消退
+    tl.to('.leaf-item', { opacity: 0, scale: 0.7, duration: 0.25, ease: 'power1.in' }, 0);
+
+    // 2. 照片向深处缩进 (Scale 0.92)
+    tl.to('.image-wrapper', {
+      scale: 0.92,
+      opacity: 0.2,
+      duration: 0.25,
+      ease: 'power1.in',
+      onComplete: () => { mainImg.src = nextImageUrl; }
+    }, 0.05);
+
+    // 3. 新照片拉远归位
+    tl.fromTo('.image-wrapper',
+      { scale: 1.08, opacity: 0.2 },
+      { scale: 1, opacity: 1, duration: 0.35, ease: 'power2.out' },
+      0.3
+    );
+
+    // 4. 树叶从四周飞回包裹
+    tl.fromTo('.leaf-tl', { x: '-60%', y: '-60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3)
+      .fromTo('.leaf-tr', { x: '60%', y: '-60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3)
+      .fromTo('.leaf-bl', { x: '-60%', y: '60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3)
+      .fromTo('.leaf-br', { x: '60%', y: '60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3);
+  }
 }
+
+// ========================================================
+// 🕹️ 交互绑定 (双端智能切换)
+// ========================================================
+
+// 统一切换控制点 (判断当前是手机还是电脑)
+function changeSlide(direction: 'next' | 'prev') {
+  const isMobile = window.innerWidth <= 768;
+  const targetIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
+
+  if (isMobile) {
+    updateDisplayWithLeafAnimation(targetIndex, direction);
+  } else {
+    updateDisplay(targetIndex, false, direction);
+  }
+}
+
+// 左右按键绑定
+prevBtn.addEventListener('click', () => changeSlide('prev'));
+nextBtn.addEventListener('click', () => changeSlide('next'));
+
+// 📱 手机手势滑动监听
+let touchStartY = 0;
+let touchStartX = 0;
+
+window.addEventListener('touchstart', (e: TouchEvent) => {
+  if (!isOpening) return;
+  touchStartY = e.changedTouches[0].clientY;
+  touchStartX = e.changedTouches[0].clientX;
+}, { passive: true });
+
+window.addEventListener('touchend', (e: TouchEvent) => {
+  if (!isOpening) return;
+  const touchEndY = e.changedTouches[0].clientY;
+  const touchEndX = e.changedTouches[0].clientX;
+
+  const deltaY = touchStartY - touchEndY;
+  const deltaX = Math.abs(touchStartX - touchEndX);
+  const minSwipeDistance = 35; // 最小触控滑动门槛
+
+  // 判定为垂直方向有效划动
+  if (Math.abs(deltaY) > minSwipeDistance && Math.abs(deltaY) > deltaX) {
+    if (deltaY > 0) {
+      changeSlide('next'); // 👆 上滑 -> 下一张 (镜头前进)
+    } else {
+      changeSlide('prev'); // 👇 下滑 -> 上一张 (镜头后退)
+    }
+  }
+}, { passive: true });
+
+// 初始化加载
+fetchImages();
+
+// ========================================================
+// 点赞功能
+// ========================================================
+const likeCheckbox = document.getElementById('like-checkbox') as HTMLInputElement;
+const likeCountEl = document.getElementById('like-count');
+
+// 1. 初始化读取 Supabase 的点赞数
+async function fetchLikes() {
+  try {
+    const res = await fetch('/api/likes');
+    if (res.ok) {
+      const data = await res.json();
+      if (likeCountEl && data.count !== undefined) {
+        likeCountEl.textContent = data.count;
+      }
+    }
+  } catch (err) {
+    console.error('获取点赞数失败:', err);
+  }
+}
+
+// 2. 勾选爱心触发点赞 +1
+if (likeCheckbox) {
+  likeCheckbox.addEventListener('change', async () => {
+    if (likeCheckbox.checked) {
+      try {
+        const res = await fetch('/api/likes', { method: 'POST' });
+        if (res.ok) {
+          const data = await res.json();
+          if (likeCountEl && data.count !== undefined) {
+            likeCountEl.textContent = data.count;
+          }
+        }
+      } catch (err) {
+        console.error('点赞失败:', err);
+      }
+    }
+  });
+}
+
+fetchLikes(); // 初始化调用
