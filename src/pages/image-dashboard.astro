@@ -1,0 +1,353 @@
+---
+// src/pages/image-dashboard.astro
+import { list } from '@vercel/blob';
+import { sql } from '@vercel/postgres'; // 如果从数据库直接查 active 状态可启用
+
+export const prerender = false;
+
+// 1. 读取 Vercel Blob 中 thai/ 目录下的所有文件
+const blobResponse = await list({ prefix: 'thai/' });
+
+// 2. 查询数据库中 active_flag 为 false 的记录，用于过滤已被“软删除”的图片
+let activeImages = blobResponse.blobs;
+
+try {
+  // 获取已停用的图片 URL 或名称列表
+  const { rows } = await sql`SELECT img_url, id FROM "gallery-likes" WHERE active_flag = false`;
+  const inactiveUrls = new Set(rows.map(r => r.img_url));
+  
+  // 过滤掉 active_flag 为 false 的图片
+  activeImages = blobResponse.blobs.filter(blob => !inactiveUrls.has(blob.url));
+} catch (err) {
+  console.warn('读取数据库 active_flag 失败，显示完整 Blob 列表:', err);
+}
+---
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thai 图片管理后台</title>
+</head>
+<body>
+  <!-- 背景遮罩 -->
+  <div class="leaf-wall-bg"></div>
+
+  <div class="dashboard-container">
+    <!-- 顶部操作栏 -->
+    <header class="dash-header">
+      <div class="header-title">
+        <h1>✦ Thai 文件夹图片管理 ✦</h1>
+        <p class="subtitle">共 {activeImages.length} 张可用图片</p>
+      </div>
+
+      <div class="header-actions">
+        <button id="select-all-btn" class="secondary-btn">全选 / 反选</button>
+        <button id="delete-btn" class="danger-btn" disabled>
+          下架选中 (<span id="selected-count">0</span>)
+        </button>
+      </div>
+    </header>
+
+    <!-- 缩略图平铺网格 -->
+    <main class="image-grid" id="image-grid">
+      {activeImages.length === 0 ? (
+        <div class="empty-state">`thai/` 目录下暂无展示中的图片</div>
+      ) : (
+        activeImages.map((img) => {
+          // 截取纯文件名作为显示名称
+          const fileName = img.pathname.replace('thai/', '');
+          return (
+            <div class="img-card" data-id={img.url} data-name={fileName}>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="card-checkbox" />
+              </div>
+              <div class="img-wrapper">
+                <img src={img.url} alt={fileName} loading="lazy" />
+              </div>
+              <div class="img-info" title={fileName}>
+                {fileName}
+              </div>
+            </div>
+          );
+        })
+      )}
+    </main>
+  </div>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #121212;
+      color: #e0d8c3;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .leaf-wall-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background:
+        radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.65) 100%),
+        url('https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/background-mobile.jpeg') center/cover no-repeat;
+      pointer-events: none;
+    }
+
+    .dashboard-container {
+      position: relative;
+      z-index: 10;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    /* 顶栏 */
+    .dash-header {
+      background: rgba(25, 23, 20, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 12px;
+      padding: 20px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: #d4af37;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+    }
+
+    .subtitle {
+      margin: 5px 0 0 0;
+      font-size: 0.85rem;
+      color: rgba(224, 216, 195, 0.6);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* 按钮基础属性 */
+    button {
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .secondary-btn {
+      background: rgba(212, 175, 55, 0.15);
+      color: #d4af37;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .secondary-btn:hover {
+      background: rgba(212, 175, 55, 0.25);
+    }
+
+    .danger-btn {
+      background: linear-gradient(135deg, #e55353 0%, #a83232 100%);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(229, 83, 83, 0.25);
+    }
+
+    .danger-btn:hover:not(:disabled) {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+
+    .danger-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(1);
+    }
+
+    /* 网格列表 */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 18px;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 0;
+      color: rgba(224, 216, 195, 0.5);
+    }
+
+    /* 卡片项 */
+    .img-card {
+      position: relative;
+      background: rgba(20, 18, 15, 0.6);
+      border: 2px solid rgba(212, 175, 55, 0.15);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .img-card:hover {
+      border-color: rgba(212, 175, 55, 0.5);
+      transform: translateY(-3px);
+    }
+
+    .img-card.selected {
+      border-color: #e55353;
+      box-shadow: 0 0 12px rgba(229, 83, 83, 0.4);
+      background: rgba(229, 83, 83, 0.08);
+    }
+
+    .checkbox-wrapper {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+    }
+
+    .card-checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: #e55353;
+      cursor: pointer;
+    }
+
+    .img-wrapper {
+      width: 100%;
+      height: 130px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .img-card:hover .img-wrapper img {
+      transform: scale(1.05);
+    }
+
+    .img-info {
+      padding: 10px;
+      font-size: 0.8rem;
+      color: rgba(224, 216, 195, 0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+  </style>
+
+  <script>
+    const cards = document.querySelectorAll<HTMLElement>('.img-card');
+    const selectAllBtn = document.getElementById('select-all-btn');
+    const deleteBtn = document.getElementById('delete-btn') as HTMLButtonElement;
+    const selectedCountEl = document.getElementById('selected-count')!;
+
+    const selectedIds = new Set<string>();
+
+    // 1. 卡片点击勾选逻辑
+    cards.forEach(card => {
+      const id = card.dataset.id!;
+      const checkbox = card.querySelector<HTMLInputElement>('.card-checkbox')!;
+
+      // 点击整张卡片切换选中状态
+      card.addEventListener('click', (e) => {
+        // 防止点击 checkbox 本身触发两次
+        if ((e.target as HTMLElement).tagName !== 'INPUT') {
+          checkbox.checked = !checkbox.checked;
+        }
+
+        if (checkbox.checked) {
+          selectedIds.add(id);
+          card.classList.add('selected');
+        } else {
+          selectedIds.delete(id);
+          card.classList.remove('selected');
+        }
+
+        updateUI();
+      });
+    });
+
+    // 2. 全选 / 反选逻辑
+    selectAllBtn?.addEventListener('click', () => {
+      const allSelected = selectedIds.size === cards.length;
+
+      cards.forEach(card => {
+        const id = card.dataset.id!;
+        const checkbox = card.querySelector<HTMLInputElement>('.card-checkbox')!;
+
+        if (allSelected) {
+          selectedIds.clear();
+          checkbox.checked = false;
+          card.classList.remove('selected');
+        } else {
+          selectedIds.add(id);
+          checkbox.checked = true;
+          card.classList.add('selected');
+        }
+      });
+
+      updateUI();
+    });
+
+    // 刷新按钮状态与计数值
+    function updateUI() {
+      selectedCountEl.textContent = selectedIds.size.toString();
+      deleteBtn.disabled = selectedIds.size === 0;
+    }
+
+    // 3. 提交软删除 (修改 gallery-likes 表 active_flag 为 false)
+    deleteBtn?.addEventListener('click', async () => {
+      if (selectedIds.size === 0) return;
+
+      const confirmMsg = `确定要下架选中的 ${selectedIds.size} 张图片吗？\n(注意：仅在 gallery-likes 中将 active_flag 置为 false，不会物理删除源文件)`;
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = '处理中...';
+
+        const res = await fetch('/gallery-api/delete-soft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: Array.from(selectedIds) })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert('✅ 下架成功！');
+          window.location.reload(); // 刷新页面展示最新状态
+        } else {
+          alert(`❌ 下架失败: ${data.error || '未知异常'}`);
+          deleteBtn.disabled = false;
+          updateUI();
+        }
+      } catch (err: any) {
+        alert(`❌ 网络请求失败: ${err.message}`);
+        deleteBtn.disabled = false;
+        updateUI();
+      }
+    });
+  </script>
+</body>
+</html>
