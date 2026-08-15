@@ -196,7 +196,7 @@ async function fetchImages() {
       const currentItem = images[currentIndex];
 
       const firstImg = new Image();
-      firstImg.src = currentItem.img_url; // 取 img_url
+      firstImg.src = currentItem.img_url;
 
       const onFirstLoad = () => {
         mainImg.src = currentItem.img_url;
@@ -230,9 +230,9 @@ function preloadAdjacentImages() {
   const prevIndex = (currentIndex - 1 + images.length) % images.length;
 
   const imgNext = new Image();
-  imgNext.src = images[nextIndex].img_url; // 取 img_url
+  imgNext.src = images[nextIndex].img_url;
   const imgPrev = new Image();
-  imgPrev.src = images[prevIndex].img_url; // 取 img_url
+  imgPrev.src = images[prevIndex].img_url;
 }
 
 // ========================================================
@@ -298,7 +298,7 @@ function updateDisplay(
 }
 
 // ========================================================
-// 手机端：镜头穿梭 + 四角拨叶切换逻辑
+// 手机端：树叶联动 + 干脆利落切图逻辑
 // ========================================================
 function updateDisplayWithLeafAnimation(
   newIndex: number,
@@ -311,9 +311,13 @@ function updateDisplayWithLeafAnimation(
   const currentItem = images[currentIndex];
   const nextImageUrl = currentItem.img_url;
 
-  // 刷新当前图的点赞 UI 状态
+  // 刷新点赞 UI
   if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
   if (likeCheckbox) likeCheckbox.checked = false;
+
+  // 树叶分组：左侧三片 (9, 10, 11) 与 右侧三片 (12, 13, 14)
+  const leftLeaves = '.leaf-top-9, .leaf-top-10, .leaf-top-11';
+  const rightLeaves = '.leaf-top-12, .leaf-top-13, .leaf-top-14';
 
   const tl = gsap.timeline({
     onComplete: () => {
@@ -323,57 +327,89 @@ function updateDisplayWithLeafAnimation(
   });
 
   if (direction === 'next') {
-    tl.to('.leaf-tl', { x: '-60%', y: '-60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
-      .to('.leaf-tr', { x: '60%', y: '-60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
-      .to('.leaf-bl', { x: '-60%', y: '60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
-      .to('.leaf-br', { x: '60%', y: '60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0);
+    // ----------------------------------------------------
+    // 【向上滑动 / 下一张】：树叶向上方拨开，图片快速向上消失
+    // ----------------------------------------------------
+    
+    // 1. 树叶向两侧上方飘开
+    tl.to(leftLeaves, { y: -70, x: -40, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
+    tl.to(rightLeaves, { y: -70, x: 40, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
 
+    // 2. 旧图片迅速向上淡出 (0.2s 极速，不卡顿)
     tl.to('.image-wrapper', {
-      scale: 1.08,
-      opacity: 0.2,
-      duration: 0.25,
+      y: -50,
+      opacity: 0,
+      scale: 0.94,
+      duration: 0.20,
       ease: 'power1.in',
       onComplete: () => { mainImg.src = nextImageUrl; }
-    }, 0.05);
+    }, 0);
 
-    tl.fromTo('.image-wrapper', 
-      { scale: 0.92, opacity: 0.2 },
-      { scale: 1, opacity: 1, duration: 0.35, ease: 'power2.out' },
-      0.3
+    // 3. 新图片从下方轻盈推入
+    tl.fromTo('.image-wrapper',
+      { y: 50, opacity: 0, scale: 0.95 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.32, ease: 'power2.out' },
+      0.22
     );
 
+    // 4. 树叶从上方优雅飘落归位，并在完成后清除内联属性以恢复 CSS 摇摆
     tl.fromTo('.leaf-item',
-      { x: '0%', y: '0%', scale: 0.8, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 0.45, ease: 'back.out(1.2)', stagger: 0.03 },
-      0.35
+      { y: -40, opacity: 0 },
+      { 
+        y: 0, 
+        opacity: 0.92, 
+        duration: 0.38, 
+        ease: 'back.out(1.2)', 
+        stagger: 0.03,
+        clearProps: 'transform,opacity' 
+      },
+      0.28
     );
 
   } else {
-    tl.to('.leaf-item', { opacity: 0, scale: 0.7, duration: 0.25, ease: 'power1.in' }, 0);
+    // ----------------------------------------------------
+    // 【向下滑动 / 上一张】：树叶反向向下散开，图片向下消失
+    // ----------------------------------------------------
+    
+    // 1. 树叶向两侧下方散开 (反向)
+    tl.to(leftLeaves, { y: 60, x: -35, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
+    tl.to(rightLeaves, { y: 60, x: 35, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
 
+    // 2. 旧图片迅速向下淡出
     tl.to('.image-wrapper', {
-      scale: 0.92,
-      opacity: 0.2,
-      duration: 0.25,
+      y: 50,
+      opacity: 0,
+      scale: 0.94,
+      duration: 0.20,
       ease: 'power1.in',
       onComplete: () => { mainImg.src = nextImageUrl; }
-    }, 0.05);
+    }, 0);
 
+    // 3. 新图片从上方掉落进来
     tl.fromTo('.image-wrapper',
-      { scale: 1.08, opacity: 0.2 },
-      { scale: 1, opacity: 1, duration: 0.35, ease: 'power2.out' },
-      0.3
+      { y: -50, opacity: 0, scale: 0.95 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.32, ease: 'power2.out' },
+      0.22
     );
 
-    tl.fromTo('.leaf-tl', { x: '-60%', y: '-60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3)
-      .fromTo('.leaf-tr', { x: '60%', y: '-60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3)
-      .fromTo('.leaf-bl', { x: '-60%', y: '60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3)
-      .fromTo('.leaf-br', { x: '60%', y: '60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3);
+    // 4. 树叶反向复位归位
+    tl.fromTo('.leaf-item',
+      { y: 40, opacity: 0 },
+      { 
+        y: 0, 
+        opacity: 0.92, 
+        duration: 0.38, 
+        ease: 'back.out(1.2)', 
+        stagger: 0.03,
+        clearProps: 'transform,opacity' 
+      },
+      0.28
+    );
   }
 }
 
 // ========================================================
-// 🕹️ 交互绑定
+// 交互绑定
 // ========================================================
 
 function changeSlide(direction: 'next' | 'prev') {
@@ -410,9 +446,9 @@ window.addEventListener('touchend', (e: TouchEvent) => {
 
   if (Math.abs(deltaY) > minSwipeDistance && Math.abs(deltaY) > deltaX) {
     if (deltaY > 0) {
-      changeSlide('next');
+      changeSlide('next'); // 上滑 -> 下一张
     } else {
-      changeSlide('prev');
+      changeSlide('prev'); // 下滑 -> 上一张
     }
   }
 }, { passive: true });
@@ -432,13 +468,13 @@ if (likeCheckbox) {
         const res = await fetch('/gallery-api/likes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: currentItem.id }) // 发送当前图片的 ID
+          body: JSON.stringify({ id: currentItem.id })
         });
 
         if (res.ok) {
           const data = await res.json();
           if (data.count !== undefined) {
-            currentItem.count = data.count; // 同步内存中的数据
+            currentItem.count = data.count;
             if (likeCountEl) likeCountEl.textContent = data.count.toString();
           }
         }

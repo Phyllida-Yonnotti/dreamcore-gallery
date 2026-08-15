@@ -148,6 +148,30 @@ html {
   animation: skeletonShimmer 2s infinite ease-in-out;
 }
 
+/* 图片退场动画优化 */
+.image-wrapper.exit-up {
+  transform: translateY(-100px) scale(0.92);
+  opacity: 0;
+  /* 0.22s 快速淡出，配合 ease-in 在结尾迅速消失，不拖泥带水 */
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0, 0.1, 1),
+    opacity 0.22s ease-in;
+}
+
+/* 图片进场动画 */
+.image-wrapper.enter-from-down {
+  transform: translateY(80px) scale(0.95);
+  opacity: 0;
+}
+
+.image-wrapper.enter-active {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  transition:
+    transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    opacity 0.25s ease-out;
+}
+
 @keyframes skeletonShimmer {
   0% {
     background-position: 200% 0;
@@ -401,31 +425,6 @@ html {
   display: none;
 }
 
-.leaf-item {
-  position: absolute;
-  user-select: none;
-  will-change: transform;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
-}
-
-/* 左侧叶子：贴在左侧，轴心在左下角（拨开时往左下旋转） */
-.leaf-left {
-  left: -8%;
-  top: 15%;
-  width: 38vw;
-  max-width: 180px;
-  transform-origin: bottom left;
-}
-
-/* 右侧叶子：贴在右侧，轴心在右下角（拨开时往右下旋转） */
-.leaf-right {
-  right: -8%;
-  bottom: 22%;
-  width: 42vw;
-  max-width: 200px;
-  transform-origin: bottom right;
-}
-
 /* ========================================================
    手机端 (屏幕宽度 <= 768px)
    ======================================================== */
@@ -506,11 +505,14 @@ html {
   /* 2. 前景树叶覆盖层 */
   .leaf-overlay {
     position: absolute;
-    inset: 0;
+    top: -10%;
+    left: 0;
+    width: 100%;
+    height: 120%;
     pointer-events: none;
     z-index: 25;
     display: block;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .leaf-item {
@@ -581,32 +583,82 @@ html {
     --base-angle: -15deg;
     animation: leafWindB 6.8s infinite ease-in-out 0.2s;
   }
-}
 
-/* 动态读取 --base-angle 的自然摇摆动画 */
-@keyframes leafWindA {
-
-  0%,
-  100% {
-    transform: rotate(calc(var(--base-angle, 0deg) - 5deg)) translateY(0px) scale(1);
+  /* 上滑手势：树叶向上/向两侧拨开 */
+  .swipe-up .leaf-top-9,
+  .swipe-up .leaf-top-10,
+  .swipe-up .leaf-top-11 {
+    animation: leafFlyUpLeft 0.4s cubic-bezier(0.2, 0, 0.2, 1) forwards !important;
   }
 
-  50% {
-    transform: rotate(calc(var(--base-angle, 0deg) + 5deg)) translateY(7px) scale(1.02);
-  }
-}
-
-@keyframes leafWindB {
-
-  0%,
-  100% {
-    transform: rotate(calc(var(--base-angle, 0deg) + 6deg)) translateY(0px);
+  .swipe-up .leaf-top-12,
+  .swipe-up .leaf-top-13,
+  .swipe-up .leaf-top-14 {
+    animation: leafFlyUpRight 0.4s cubic-bezier(0.2, 0, 0.2, 1) forwards !important;
   }
 
-  50% {
-    transform: rotate(calc(var(--base-angle, 0deg) - 4deg)) translateY(9px);
+  /* 下滑手势：使用同一个 Keyframe 关键帧，通过 reverse 倒序播放 */
+  .swipe-down .leaf-top-9,
+  .swipe-down .leaf-top-10,
+  .swipe-down .leaf-top-11 {
+    animation: leafFlyUpLeft 0.4s cubic-bezier(0.2, 0, 0.2, 1) reverse forwards !important;
   }
 
+  .swipe-down .leaf-top-12,
+  .swipe-down .leaf-top-13,
+  .swipe-down .leaf-top-14 {
+    animation: leafFlyUpRight 0.4s cubic-bezier(0.2, 0, 0.2, 1) reverse forwards !important;
+  }
+
+  /* 动态读取 --base-angle 的自然摇摆动画 */
+  @keyframes leafWindA {
+
+    0%,
+    100% {
+      transform: rotate(calc(var(--base-angle, 0deg) - 5deg)) translateY(0px) scale(1);
+    }
+
+    50% {
+      transform: rotate(calc(var(--base-angle, 0deg) + 5deg)) translateY(7px) scale(1.02);
+    }
+  }
+
+  @keyframes leafWindB {
+
+    0%,
+    100% {
+      transform: rotate(calc(var(--base-angle, 0deg) + 6deg)) translateY(0px);
+    }
+
+    50% {
+      transform: rotate(calc(var(--base-angle, 0deg) - 4deg)) translateY(9px);
+    }
+
+  }
+
+  @keyframes leafFlyUpLeft {
+    0% {
+      transform: rotate(calc(var(--base-angle, 0deg))) translateY(0) scale(1);
+      opacity: 0.92;
+    }
+
+    100% {
+      transform: rotate(calc(var(--base-angle, 0deg) - 25deg)) translateY(-60px) translateX(-30px) scale(1.08);
+      opacity: 0;
+    }
+  }
+
+  @keyframes leafFlyUpRight {
+    0% {
+      transform: rotate(calc(var(--base-angle, 0deg))) translateY(0) scale(1);
+      opacity: 0.92;
+    }
+
+    100% {
+      transform: rotate(calc(var(--base-angle, 0deg) + 25deg)) translateY(-60px) translateX(30px) scale(1.08);
+      opacity: 0;
+    }
+  }
 }
 
 /* ========================================================
