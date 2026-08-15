@@ -16,7 +16,10 @@
       body {
         background-color: #f8fafc;
         color: #334155;
-        font-family: system-ui, -apple-system, sans-serif;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
         min-height: 100vh;
         display: flex;
         justify-content: center;
@@ -90,7 +93,9 @@
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
-        transition: background 0.2s ease, transform 0.1s ease;
+        transition:
+          background 0.2s ease,
+          transform 0.1s ease;
       }
       button:hover {
         background: #1e293b;
@@ -137,79 +142,66 @@
   </head>
   <body>
     <div class="upload-card">
-      <h1>上传图片</h1>
-      <p class="subtitle">选择文件上传至 Vercel Blob 的 <code>thai/</code> 目录</p>
+      <h2>上传新图片</h2>
 
-      <form id="upload-form" class="form-group">
-        <div class="file-input-wrapper">
-          <input type="file" id="file-input" accept="image/*" required />
-          <div class="upload-hint" id="file-hint">
-            点击选择 或 将图片拖放到此处
-          </div>
-        </div>
-        <button type="submit" id="submit-btn">开始上传</button>
-      </form>
-
-      <div id="status"></div>
-      <div id="preview" class="preview-box">
-        <img id="preview-img" src="" alt="上传预览" />
+      <!-- 图片名称输入框 -->
+      <div class="input-group">
+        <label for="img-name">图片名称：</label>
+        <input
+          type="text"
+          id="img-name"
+          placeholder="请输入图片名称或描述"
+          required
+        />
       </div>
+
+      <!-- 图片文件选择框 -->
+      <div class="input-group">
+        <label for="img-file">选择图片：</label>
+        <input type="file" id="img-file" accept="image/*" required />
+      </div>
+
+      <button id="upload-btn">确认上传</button>
+      <div id="upload-status"></div>
     </div>
 
     <script>
-      const form = document.getElementById('upload-form') as HTMLFormElement;
-      const fileInput = document.getElementById('file-input') as HTMLInputElement;
-      const fileHint = document.getElementById('file-hint') as HTMLDivElement;
-      const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-      const statusDiv = document.getElementById('status') as HTMLDivElement;
-      const previewBox = document.getElementById('preview') as HTMLDivElement;
-      const previewImg = document.getElementById('preview-img') as HTMLImageElement;
+      const uploadBtn = document.getElementById("upload-btn");
+      const imgFileInput = document.getElementById(
+        "img-file",
+      ) as HTMLInputElement;
+      const imgNameInput = document.getElementById(
+        "img-name",
+      ) as HTMLInputElement;
+      const statusEl = document.getElementById("upload-status");
 
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files?.[0];
-        if (file) {
-          fileHint.innerHTML = `已选择: <span>${file.name}</span>`;
-        }
-      });
+      uploadBtn?.addEventListener("click", async () => {
+        const file = imgFileInput.files?.[0];
+        const name = imgNameInput.value.trim();
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const file = fileInput.files?.[0];
-        if (!file) return;
-
-        submitBtn.disabled = true;
-        statusDiv.className = 'status-loading';
-        statusDiv.textContent = '文件上传中...';
-        previewBox.style.display = 'none';
+        if (!file) return alert("请选择要上传的图片");
+        if (!name) return alert("请输入图片名称");
 
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append("file", file);
+        formData.append("name", name);
 
         try {
-          const res = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
+          statusEl!.textContent = "正在上传...";
+          const res = await fetch("/gallery-api/upload", {
+            method: "POST",
+            body: formData, // 直接发送 FormData，无需手动设 Content-Type
           });
 
-          const data = await res.json();
-
-          if (res.ok && data.success) {
-            statusDiv.className = 'status-success';
-            statusDiv.textContent = '上传成功！';
-            
-            previewImg.src = data.url;
-            previewBox.style.display = 'block';
-            form.reset();
-            fileHint.innerHTML = '点击选择 或 将图片拖放到此处';
+          if (res.ok) {
+            statusEl!.textContent = "✅ 上传成功！";
+            imgNameInput.value = "";
+            imgFileInput.value = "";
           } else {
-            throw new Error(data.error || '上传失败');
+            throw new Error("上传失败");
           }
         } catch (err: any) {
-          statusDiv.className = 'status-error';
-          statusDiv.textContent = '错误: ' + err.message;
-        } finally {
-          submitBtn.disabled = false;
+          statusEl!.textContent = `❌ 错误：${err.message}`;
         }
       });
     </script>

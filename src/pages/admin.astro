@@ -1,0 +1,136 @@
+<!-- admin.astro -->
+<div class="admin-container">
+  <header class="admin-header">
+    <h1>图片管理后台</h1>
+    <div class="actions">
+      <button id="select-all-btn">全选 / 反选</button>
+      <button id="delete-selected-btn" class="danger-btn">删除选中 (<span id="selected-count">0</span>)</button>
+    </div>
+  </header>
+
+  <!-- 缩略图平铺网格 -->
+  <div class="grid-container" id="image-grid">
+    <!-- 动态渲染图片列表 -->
+  </div>
+</div>
+
+<style>
+  .admin-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+  .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+  
+  .img-card {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #1e1e1e;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .img-card.selected { border-color: #ff4d4f; }
+  .img-card img { width: 100%; height: 120px; object-fit: cover; display: block; }
+  
+  .img-info { padding: 8px; font-size: 13px; color: #fff; text-align: center; }
+  .checkbox-overlay {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+  }
+  .danger-btn { background: #ff4d4f; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+</style>
+
+<script>
+  interface ImageItem { id: string | number; img_url: string; name?: string; }
+  
+  let imagesList: ImageItem[] = [];
+  let selectedIds = new Set<string | number>();
+
+  const grid = document.getElementById('image-grid')!;
+  const selectedCountEl = document.getElementById('selected-count')!;
+  const selectAllBtn = document.getElementById('select-all-btn')!;
+  const deleteBtn = document.getElementById('delete-selected-btn')!;
+
+  // 1. 获取所有图片数据
+  async function loadImages() {
+    try {
+      const res = await fetch('/gallery-api/images');
+      imagesList = await res.json();
+      selectedIds.clear();
+      renderGrid();
+    } catch (err) {
+      alert('加载图片失败');
+    }
+  }
+
+  // 2. 渲染网格视图
+  function renderGrid() {
+    grid.innerHTML = '';
+    imagesList.forEach(item => {
+      const isSelected = selectedIds.has(item.id);
+      const card = document.createElement('div');
+      card.className = `img-card ${isSelected ? 'selected' : ''}`;
+      
+      card.innerHTML = `
+        <input type="checkbox" class="checkbox-overlay" ${isSelected ? 'checked' : ''} />
+        <img src="${item.img_url}" alt="${item.name || ''}" />
+        <div class="img-info">${item.name || '未命名'}</div>
+      `;
+
+      card.addEventListener('click', (e) => {
+        toggleSelect(item.id);
+      });
+
+      grid.appendChild(card);
+    });
+
+    selectedCountEl.textContent = selectedIds.size.toString();
+  }
+
+  // 3. 选择/取消选择逻辑
+  function toggleSelect(id: string | number) {
+    if (selectedIds.has(id)) {
+      selectedIds.delete(id);
+    } else {
+      selectedIds.add(id);
+    }
+    renderGrid();
+  }
+
+  // 4. 全选 / 反选
+  selectAllBtn.addEventListener('click', () => {
+    if (selectedIds.size === imagesList.length) {
+      selectedIds.clear();
+    } else {
+      imagesList.forEach(item => selectedIds.add(item.id));
+    }
+    renderGrid();
+  });
+
+  // 5. 批量删除提交 API
+  deleteBtn.addEventListener('click', async () => {
+    if (selectedIds.size === 0) return alert('请先勾选需要删除的图片');
+    if (!confirm(`确定要删除选中的 ${selectedIds.size} 张图片吗？`)) return;
+
+    try {
+      const res = await fetch('/gallery-api/delete-batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: Array.from(selectedIds) })
+      });
+
+      if (res.ok) {
+        alert('删除成功');
+        loadImages(); // 刷新网格
+      } else {
+        alert('删除失败');
+      }
+    } catch (err) {
+      alert('网络请求异常');
+    }
+  });
+
+  loadImages();
+</script>
