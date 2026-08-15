@@ -3,7 +3,6 @@ import vercel from '@astrojs/vercel';
 
 export default defineConfig({
   adapter: vercel(),
-
   env: {
     schema: {
       BLOB_PUBLIC_READ_WRITE_TOKEN: envField.string({ 
@@ -11,14 +10,6 @@ export default defineConfig({
         access: 'secret',
         optional: true,
       }),
-    }
-  },
-  vite: {
-    ssr: {
-      external: [
-        '@neondatabase/serverless',
-        'rolldown'
-      ]
     }
   }
 });

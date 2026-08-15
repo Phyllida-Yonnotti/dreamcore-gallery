@@ -23,7 +23,8 @@
     "typescript": "^6.0.3"
   },
   "devDependencies": {
-    "@types/node": "^26.1.2"
+    "@types/node": "^26.1.2",
+    "rolldown": "^1.2.4"
   },
   "overrides": {
     "q": "^1.5.1"
