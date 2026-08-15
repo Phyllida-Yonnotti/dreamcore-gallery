@@ -1,6 +1,13 @@
 import { gsap } from 'gsap';
 
-let images: string[] = [];
+// 1. 定义图片数据接口
+interface ImageItem {
+  id: string | number;
+  img_url: string;
+  count: number;
+}
+
+let images: ImageItem[] = [];
 let currentIndex = 0;
 
 const splash = document.getElementById('splash')!;
@@ -11,6 +18,10 @@ const mainImg = document.getElementById('main-img') as HTMLImageElement;
 const prevBtn = document.getElementById('prev-btn')!;
 const nextBtn = document.getElementById('next-btn')!;
 const subtitle = document.querySelector('.subtitle-container') as HTMLElement;
+
+// 点赞相关 DOM 元素
+const likeCheckbox = document.getElementById('like-checkbox') as HTMLInputElement;
+const likeCountEl = document.getElementById('like-count');
 
 let isReadyToOpen = false; // 标记首张图是否完全加载完成
 let isAnimating = false;  // 状态锁：防止快速滑动导致动画重叠
@@ -156,7 +167,6 @@ splash.addEventListener('click', (e: MouseEvent) => {
     { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 1.1, delay: 0.25, ease: 'power2.out' }
   );
 
-  // BANNER 平滑入场
   gsap.fromTo('.top-banner-container',
     { y: -25, opacity: 0 },
     { y: 0, opacity: 1, duration: 1.0, delay: 0.3, ease: 'power2.out' }
@@ -176,21 +186,25 @@ splash.addEventListener('click', (e: MouseEvent) => {
 async function fetchImages() {
   try {
     if (splashHint) splashHint.innerHTML = "静水沉淀中...";
-
-    // 初始化时先隐藏 <img>，露出 CSS 骨架屏动画
     if (mainImg) mainImg.style.opacity = '0';
 
-    const response = await fetch('/api/images');
+    const response = await fetch('/gallery-api/images');
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     images = await response.json();
 
     if (Array.isArray(images) && images.length > 0) {
+      const currentItem = images[currentIndex];
+
       const firstImg = new Image();
-      firstImg.src = images[0];
+      firstImg.src = currentItem.img_url; // 取 img_url
 
       const onFirstLoad = () => {
-        mainImg.src = images[0];
-        // 图片载入完毕后，平滑淡入显示图片
+        mainImg.src = currentItem.img_url;
+        
+        // 同步首张图的点赞数 UI
+        if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
+        if (likeCheckbox) likeCheckbox.checked = false;
+
         gsap.to(mainImg, { opacity: 1, duration: 0.4 });
 
         isReadyToOpen = true;
@@ -216,9 +230,9 @@ function preloadAdjacentImages() {
   const prevIndex = (currentIndex - 1 + images.length) % images.length;
 
   const imgNext = new Image();
-  imgNext.src = images[nextIndex];
+  imgNext.src = images[nextIndex].img_url; // 取 img_url
   const imgPrev = new Image();
-  imgPrev.src = images[prevIndex];
+  imgPrev.src = images[prevIndex].img_url; // 取 img_url
 }
 
 // ========================================================
@@ -233,7 +247,12 @@ function updateDisplay(
   isAnimating = true;
 
   currentIndex = (index + images.length) % images.length;
-  const currentUrl = images[currentIndex];
+  const currentItem = images[currentIndex];
+  const currentUrl = currentItem.img_url;
+
+  // 刷新当前图的点赞 UI 状态
+  if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
+  if (likeCheckbox) likeCheckbox.checked = false;
 
   if (isInitial) {
     mainImg.src = currentUrl;
@@ -289,7 +308,12 @@ function updateDisplayWithLeafAnimation(
   isAnimating = true;
 
   currentIndex = (newIndex + images.length) % images.length;
-  const nextImageUrl = images[currentIndex];
+  const currentItem = images[currentIndex];
+  const nextImageUrl = currentItem.img_url;
+
+  // 刷新当前图的点赞 UI 状态
+  if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
+  if (likeCheckbox) likeCheckbox.checked = false;
 
   const tl = gsap.timeline({
     onComplete: () => {
@@ -299,14 +323,11 @@ function updateDisplayWithLeafAnimation(
   });
 
   if (direction === 'next') {
-    // 🚀 向上滑动 / 下一张：镜头【前进】
-    // 1. 树叶向四周爆开飞掠并放大 (模拟拂过眼前)
     tl.to('.leaf-tl', { x: '-60%', y: '-60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
       .to('.leaf-tr', { x: '60%', y: '-60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
       .to('.leaf-bl', { x: '-60%', y: '60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
       .to('.leaf-br', { x: '60%', y: '60%', scale: 1.4, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0);
 
-    // 2. 照片向前推进拉近 (Scale 1.0 -> 1.08)
     tl.to('.image-wrapper', {
       scale: 1.08,
       opacity: 0.2,
@@ -315,14 +336,12 @@ function updateDisplayWithLeafAnimation(
       onComplete: () => { mainImg.src = nextImageUrl; }
     }, 0.05);
 
-    // 3. 新照片从深处拉近就位
     tl.fromTo('.image-wrapper', 
       { scale: 0.92, opacity: 0.2 },
       { scale: 1, opacity: 1, duration: 0.35, ease: 'power2.out' },
       0.3
     );
 
-    // 4. 新树叶在前屏悄然淡入凝结 (模拟进入下一层叶丛)
     tl.fromTo('.leaf-item',
       { x: '0%', y: '0%', scale: 0.8, opacity: 0 },
       { scale: 1, opacity: 1, duration: 0.45, ease: 'back.out(1.2)', stagger: 0.03 },
@@ -330,11 +349,8 @@ function updateDisplayWithLeafAnimation(
     );
 
   } else {
-    // ⏪ 向下滑动 / 上一张：镜头【后退】
-    // 1. 当前树叶向内散开消退
     tl.to('.leaf-item', { opacity: 0, scale: 0.7, duration: 0.25, ease: 'power1.in' }, 0);
 
-    // 2. 照片向深处缩进 (Scale 0.92)
     tl.to('.image-wrapper', {
       scale: 0.92,
       opacity: 0.2,
@@ -343,14 +359,12 @@ function updateDisplayWithLeafAnimation(
       onComplete: () => { mainImg.src = nextImageUrl; }
     }, 0.05);
 
-    // 3. 新照片拉远归位
     tl.fromTo('.image-wrapper',
       { scale: 1.08, opacity: 0.2 },
       { scale: 1, opacity: 1, duration: 0.35, ease: 'power2.out' },
       0.3
     );
 
-    // 4. 树叶从四周飞回包裹
     tl.fromTo('.leaf-tl', { x: '-60%', y: '-60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3)
       .fromTo('.leaf-tr', { x: '60%', y: '-60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3)
       .fromTo('.leaf-bl', { x: '-60%', y: '60%', scale: 1.3, opacity: 0 }, { x: '0%', y: '0%', scale: 1, opacity: 1, duration: 0.4 }, 0.3)
@@ -359,10 +373,9 @@ function updateDisplayWithLeafAnimation(
 }
 
 // ========================================================
-// 🕹️ 交互绑定 (双端智能切换)
+// 🕹️ 交互绑定
 // ========================================================
 
-// 统一切换控制点 (判断当前是手机还是电脑)
 function changeSlide(direction: 'next' | 'prev') {
   const isMobile = window.innerWidth <= 768;
   const targetIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
@@ -374,11 +387,9 @@ function changeSlide(direction: 'next' | 'prev') {
   }
 }
 
-// 左右按键绑定
 prevBtn.addEventListener('click', () => changeSlide('prev'));
 nextBtn.addEventListener('click', () => changeSlide('next'));
 
-// 📱 手机手势滑动监听
 let touchStartY = 0;
 let touchStartX = 0;
 
@@ -395,52 +406,40 @@ window.addEventListener('touchend', (e: TouchEvent) => {
 
   const deltaY = touchStartY - touchEndY;
   const deltaX = Math.abs(touchStartX - touchEndX);
-  const minSwipeDistance = 35; // 最小触控滑动门槛
+  const minSwipeDistance = 35;
 
-  // 判定为垂直方向有效划动
   if (Math.abs(deltaY) > minSwipeDistance && Math.abs(deltaY) > deltaX) {
     if (deltaY > 0) {
-      changeSlide('next'); // 👆 上滑 -> 下一张 (镜头前进)
+      changeSlide('next');
     } else {
-      changeSlide('prev'); // 👇 下滑 -> 上一张 (镜头后退)
+      changeSlide('prev');
     }
   }
 }, { passive: true });
 
-// 初始化加载
+// 初始化加载图片列表
 fetchImages();
 
 // ========================================================
-// 点赞功能
+// ❤️ 单图独立点赞功能
 // ========================================================
-const likeCheckbox = document.getElementById('like-checkbox') as HTMLInputElement;
-const likeCountEl = document.getElementById('like-count');
-
-// 1. 初始化读取 Supabase 的点赞数
-async function fetchLikes() {
-  try {
-    const res = await fetch('/api/likes');
-    if (res.ok) {
-      const data = await res.json();
-      if (likeCountEl && data.count !== undefined) {
-        likeCountEl.textContent = data.count;
-      }
-    }
-  } catch (err) {
-    console.error('获取点赞数失败:', err);
-  }
-}
-
-// 2. 勾选爱心触发点赞 +1
 if (likeCheckbox) {
   likeCheckbox.addEventListener('change', async () => {
-    if (likeCheckbox.checked) {
+    if (likeCheckbox.checked && images[currentIndex]) {
+      const currentItem = images[currentIndex];
+
       try {
-        const res = await fetch('/api/likes', { method: 'POST' });
+        const res = await fetch('/api/likes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: currentItem.id }) // 发送当前图片的 ID
+        });
+
         if (res.ok) {
           const data = await res.json();
-          if (likeCountEl && data.count !== undefined) {
-            likeCountEl.textContent = data.count;
+          if (data.count !== undefined) {
+            currentItem.count = data.count; // 同步内存中的数据
+            if (likeCountEl) likeCountEl.textContent = data.count.toString();
           }
         }
       } catch (err) {
@@ -449,5 +448,3 @@ if (likeCheckbox) {
     }
   });
 }
-
-fetchLikes(); // 初始化调用
