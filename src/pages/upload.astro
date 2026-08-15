@@ -223,8 +223,69 @@
       const statusEl = document.getElementById("upload-status");
       const fileHint = document.getElementById("file-hint");
 
-      // 正则表达式：只允许英文字母、数字、半角横杠(-) 和下划线(_)
       const validFileNameRegex = /^[a-zA-Z0-9_-]+$/;
+
+      // 💡 核心：HTML5 Canvas 图片等比例缩小与压缩函数
+      function compressImage(
+        file: File,
+        maxWidth = 1920,
+        maxHeight = 1920,
+        quality = 0.85,
+      ): Promise<File> {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+
+          reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target?.result as string;
+
+            img.onload = () => {
+              let width = img.width;
+              let height = img.height;
+
+              // 计算等比例缩放尺寸
+              if (width > maxWidth || height > maxHeight) {
+                if (width / height > maxWidth / maxHeight) {
+                  height = Math.round((height * maxWidth) / width);
+                  width = maxWidth;
+                } else {
+                  width = Math.round((width * maxHeight) / height);
+                  height = maxHeight;
+                }
+              }
+
+              // 创建隐藏 Canvas 绘图
+              const canvas = document.createElement("canvas");
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext("2d");
+
+              if (!ctx) return reject(new Error("Canvas 初始化失败"));
+              ctx.drawImage(img, 0, 0, width, height);
+
+              // 导出压缩后的文件，优先保持原始 MIME 类型
+              const mimeType = file.type || "image/jpeg";
+              canvas.toBlob(
+                (blob) => {
+                  if (!blob) return reject(new Error("图片压缩失败"));
+                  const compressedFile = new File([blob], file.name, {
+                    type: mimeType,
+                    lastModified: Date.now(),
+                  });
+                  resolve(compressedFile);
+                },
+                mimeType,
+                quality, // 0.85 表示 85% 画质，压缩效果极好且清晰
+              );
+            };
+
+            img.onerror = (err) => reject(err);
+          };
+
+          reader.onerror = (err) => reject(err);
+        });
+      }
 
       // 1. 选择图片时提取纯文件名
       imgFileInput?.addEventListener("change", () => {
@@ -243,13 +304,13 @@
           }
 
           if (fileHint) {
-            fileHint.textContent = `已选择: ${file.name} (后缀名 ${ext} 将锁定保留)`;
+            fileHint.textContent = `已选择: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
             fileHint.style.color = "#d4af37";
           }
         }
       });
 
-      // 2. 点击上传时增加校验
+      // 2. 点击上传逻辑（自动压缩后再发送）
       uploadBtn?.addEventListener("click", async () => {
         const file = imgFileInput.files?.[0];
         const name = imgNameInput.value.trim();
@@ -257,24 +318,33 @@
         if (!file) return alert("请选择要上传的图片");
         if (!name) return alert("请输入图片名称");
 
-        // 校验文件名格式
         if (!validFileNameRegex.test(name)) {
           alert(
-            "文件名格式不合法！\n只能包含英文字母、数字、半角横杠(-) 和下划线(_)，不能包含中文或特殊符号。",
+            "⚠️ 文件名格式不合法！\n只能包含英文字母、数字、半角横杠(-) 和下划线(_)。",
           );
           imgNameInput.focus();
           return;
         }
 
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("name", name);
-
         try {
           if (statusEl) {
-            statusEl.textContent = "正在上传中...";
+            statusEl.textContent = "⏳ 正在自动优化并压缩图片...";
             statusEl.style.color = "#d4af37";
           }
+
+          // 💡 如果图片体积大于 1.5MB 或尺寸过大，自动执行压缩
+          let uploadFile = file;
+          if (file.size > 1.5 * 1024 * 1024 || file.type.startsWith("image/")) {
+            uploadFile = await compressImage(file, 2048, 2048, 0.82);
+          }
+
+          if (statusEl) {
+            statusEl.textContent = `⏳ 正在上传中 (${(uploadFile.size / 1024).toFixed(0)} KB)...`;
+          }
+
+          const formData = new FormData();
+          formData.append("file", uploadFile);
+          formData.append("name", name);
 
           const res = await fetch("/gallery-api/upload", {
             method: "POST",
@@ -290,7 +360,7 @@
           }
 
           if (statusEl) {
-            statusEl.textContent = "上传成功！";
+            statusEl.textContent = "✨ 上传成功！";
             statusEl.style.color = "#4ea851";
           }
           imgNameInput.value = "";
@@ -301,7 +371,7 @@
           }
         } catch (err: any) {
           if (statusEl) {
-            statusEl.textContent = `上传失败: ${err.message}`;
+            statusEl.textContent = `❌ 上传失败: ${err.message}`;
             statusEl.style.color = "#e55353";
           }
         }
