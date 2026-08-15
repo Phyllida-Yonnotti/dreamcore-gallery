@@ -39,10 +39,9 @@ html {
   align-items: center;
 
   /* 半透明深色 + 毛玻璃模糊，透出背后的复古壁纸 */
-  background: rgba(12, 16, 22, 0.85);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(16px);
-
+  background: rgba(12, 16, 22, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   cursor: pointer;
   overflow: hidden;
 }
@@ -235,7 +234,7 @@ html {
   display: none;
   color: white;
 }
- 
+
 .like-count {
   color: #ffffff;
   font-size: 13px;
@@ -395,12 +394,11 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
   /* 穿透点击，不影响手势 */
+  pointer-events: none;
   z-index: 25;
-  /* 确保层级高于照片 (.image-wrapper z-index: 10) */
-  display: none;
   /* 默认桌面端隐藏 */
+  display: none;
 }
 
 .leaf-item {
@@ -489,7 +487,6 @@ html {
     position: fixed;
     inset: 0;
     z-index: 1;
-    /* 替换为你深色叶墙静态图片的 URL */
     background:
       radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.75) 100%),
       url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
@@ -514,50 +511,78 @@ html {
     z-index: 25;
     display: block;
     overflow: hidden;
-    /* 保证叶子飞出屏幕时不出现滚动条 */
   }
 
   .leaf-item {
     position: absolute;
     user-select: none;
-    will-change: transform, opacity;
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+    will-change: transform;
+
+    /* 💡 优化 1：颜色融合 */
+    /* 降低亮度(0.78)、微调饱和度(0.85)并增加沉稳暗影，使其自然融入复古暗色背景中 */
+    filter: brightness(0.78) contrast(1.08) saturate(0.85) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.55));
+    opacity: 0.92;
   }
 
-  /* 四角树叶分布 */
-  .leaf-tl {
-    top: -4%;
-    left: -10%;
-    width: 45vw;
-    max-width: 200px;
-    transform-origin: top left;
+  /* 💡 优化 3：偏上方随意的自然的散落布局（移除底部死板四角） */
+  /* 左上挂叶 */
+  .leaf-top-1 {
+    top: -5%;
+    left: -8%;
+    width: 44vw;
+    max-width: 190px;
+    animation: leafWindA 6s infinite ease-in-out;
   }
 
-  .leaf-tr {
+  /* 偏中左下方微垂叶 */
+  .leaf-top-2 {
     top: -2%;
+    left: 22%;
+    width: 36vw;
+    max-width: 150px;
+    animation: leafWindB 7.5s infinite ease-in-out 0.5s;
+  }
+
+  /* 偏中右压顶叶 */
+  .leaf-top-3 {
+    top: 1%;
+    right: 18%;
+    width: 38vw;
+    max-width: 160px;
+    animation: leafWindA 5.5s infinite ease-in-out 1.2s;
+  }
+
+  /* 右上探出叶 */
+  .leaf-top-4 {
+    top: -4%;
     right: -10%;
-    width: 48vw;
-    max-width: 210px;
-    transform-origin: top right;
-  }
-
-  .leaf-bl {
-    bottom: 12%;
-    left: -12%;
-    width: 50vw;
-    max-width: 220px;
-    transform-origin: bottom left;
-  }
-
-  .leaf-br {
-    bottom: 10%;
-    right: -12%;
-    width: 52vw;
-    max-width: 230px;
-    transform-origin: bottom right;
+    width: 46vw;
+    max-width: 200px;
+    animation: leafWindB 6.8s infinite ease-in-out 0.2s;
   }
 }
 
+/* 微风轻摇自然动效 (全局添加) */
+@keyframes leafWindA {
+
+  0%,
+  100% {
+    transform: rotate(-12deg) translateY(0px) scale(1);
+  }
+
+  50% {
+    transform: rotate(-6deg) translateY(8px) scale(1.02);
+  }
+}
+
+@keyframes leafWindB {
+  0%, 100% {
+    transform: rotate(15deg) scaleX(-1) translateY(0px);
+  }
+  50% {
+    transform: rotate(21deg) scaleX(-1) translateY(10px);
+  }
+}
 
 /* ========================================================
    平板端 (屏幕宽度在 769px 到 1024px 之间，可选)
