@@ -421,7 +421,7 @@ window.addEventListener('touchend', (e: TouchEvent) => {
 fetchImages();
 
 // ========================================================
-// ❤️ 单图独立点赞功能
+// 单图独立点赞功能
 // ========================================================
 if (likeCheckbox) {
   likeCheckbox.addEventListener('change', async () => {
@@ -429,7 +429,7 @@ if (likeCheckbox) {
       const currentItem = images[currentIndex];
 
       try {
-        const res = await fetch('/api/likes', {
+        const res = await fetch('/gallery-api/likes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: currentItem.id }) // 发送当前图片的 ID

@@ -105,7 +105,7 @@ html {
    ======================================================== */
 .leaf-wall-bg,
 .leaf-overlay {
-  display: none !important;
+  display: none;
 }
 
 /* ========================================================
@@ -177,8 +177,9 @@ html {
   width: 100%;
   margin-top: 18px;
   padding: 0 12px;
-
-  /* 💡 统一图标高度控制：修改此数值即可同时改变左右箭头和爱心的大小 */
+  position: relative;
+  z-index: 30;
+  /* 统一图标高度控制：修改此数值即可同时改变左右箭头和爱心的大小 */
   --icon-height: 38px;
 }
 
@@ -484,6 +485,7 @@ html {
 
   /* 仅在手机端启用叶子层 */
   .leaf-wall-bg {
+    display: block;
     position: fixed;
     inset: 0;
     z-index: 1;
@@ -492,6 +494,11 @@ html {
       radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.75) 100%),
       url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
     pointer-events: none;
+  }
+
+  .card {
+    position: relative;
+    z-index: 10;
   }
 
   .gallery-container {
