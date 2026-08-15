@@ -1,31 +1,29 @@
-import { list } from '@vercel/blob';
+// src/pages/api/images.ts
+import { createClient } from '@supabase/supabase-js';
 import type { APIRoute } from 'astro';
+
+export const prerender = false;
+
+const supabase = createClient(
+  import.meta.env.SUPABASE_URL || '',
+  import.meta.env.SUPABASE_ANON_KEY || ''
+);
 
 export const GET: APIRoute = async () => {
   try {
-    // 读取自定义 Token 或 默认 Token
-    const token = import.meta.env.BLOB_PUBLIC_READ_WRITE_TOKEN || import.meta.env.BLOB_READ_WRITE_TOKEN;
+    // 从 Supabase 拿图片列表（包含 id, img_url, count）
+    const { data, error } = await supabase
+      .from('gallery_likes')
+      .select('id, img_url, count')
+      .order('id', { ascending: true });
 
-    const { blobs } = await list({
-      prefix: 'thai/',
-      token: token,
-    });
+    if (error) throw error;
 
-    const imageUrls = blobs
-      .map((blob) => blob.url)
-      .filter((url) => /\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url));
-
-    return new Response(JSON.stringify(imageUrls), {
+    return new Response(JSON.stringify(data), {
       status: 200,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=3600, s-maxage=86400'
-      },
-    });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error?.message || 'Failed to fetch images' }), {
-      status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
+  } catch (error: any) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 };

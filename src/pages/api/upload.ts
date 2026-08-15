@@ -16,7 +16,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const token = import.meta.env.BLOB_READ_WRITE_TOKEN || import.meta.env.BLOB_PUBLIC_READ_WRITE_TOKEN;
+    const token = import.meta.env.BLOB_PUBLIC_READ_WRITE_TOKEN || import.meta.env.BLOB_READ_WRITE_TOKEN;
 
     if (!token) {
       return new Response(JSON.stringify({ error: '环境变量未配置 Blob Token' }), {
