@@ -487,9 +487,10 @@ html {
     inset: 0;
     z-index: 1;
     background:
-      radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.75) 100%),
+      radial-gradient(circle, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%),
       url('https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/background-mobile.jpeg') center/cover no-repeat;
     pointer-events: none;
+    filter: brightness(1.25) contrast(1.02);
   }
 
   .card {
