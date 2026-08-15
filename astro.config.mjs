@@ -15,7 +15,10 @@ export default defineConfig({
   },
   vite: {
     ssr: {
-      external: ['@neondatabase/serverless']
+      external: [
+        '@neondatabase/serverless',
+        'rolldown'
+      ]
     }
   }
 });
