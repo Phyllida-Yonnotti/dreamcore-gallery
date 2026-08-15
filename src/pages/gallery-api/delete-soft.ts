@@ -1,12 +1,12 @@
 // src/pages/gallery-api/delete-soft.ts
 import type { APIRoute } from 'astro';
-import { sql } from '@vercel/postgres';
+import { neon } from '@neondatabase/serverless';
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { ids }: { ids: number[] } = await request.json();
+    const { ids } = await request.json(); // 接收前端传过来的 URL 或 ID 数组
 
     if (!Array.isArray(ids) || ids.length === 0) {
       return new Response(
@@ -15,11 +15,15 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // 使用 @vercel/postgres 批量更新 SQL
+    // 初始化 sql 客户端
+    const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL!;
+    const sql = neon(dbUrl);
+
+    // 使用 sql`...` 执行批量更新（Neon 模板字符串天然支持数组解析）
     await sql`
       UPDATE "gallery-likes"
       SET active_flag = false
-      WHERE id = ANY(${ids as any})
+      WHERE img_url = ANY(${ids})
     `;
 
     return new Response(
