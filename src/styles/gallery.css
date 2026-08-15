@@ -489,7 +489,7 @@ html {
     z-index: 1;
     background:
       radial-gradient(circle, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.75) 100%),
-      url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+      url('https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/background-mobile.jpeg') center/cover no-repeat;
     pointer-events: none;
   }
 
@@ -517,71 +517,96 @@ html {
     position: absolute;
     user-select: none;
     will-change: transform;
-
-    /* 💡 优化 1：颜色融合 */
-    /* 降低亮度(0.78)、微调饱和度(0.85)并增加沉稳暗影，使其自然融入复古暗色背景中 */
     filter: brightness(0.78) contrast(1.08) saturate(0.85) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.55));
     opacity: 0.92;
   }
 
-  /* 💡 优化 3：偏上方随意的自然的散落布局（移除底部死板四角） */
-  /* 左上挂叶 */
-  .leaf-top-1 {
+  /* 片顶部自然散落树叶 (引入 --base-angle 避免动画冲掉旋转) */
+  /* 09: 左上角探出叶 (顺时针旋转 90°) */
+  .leaf-top-9 {
     top: -5%;
     left: -8%;
-    width: 44vw;
-    max-width: 190px;
+    width: 38vw;
+    max-width: 170px;
+    --base-angle: 90deg;
     animation: leafWindA 6s infinite ease-in-out;
   }
 
-  /* 偏中左下方微垂叶 */
-  .leaf-top-2 {
+  /* 10: 偏中左下方微垂叶 (顺时针旋转 90°) */
+  .leaf-top-10 {
     top: -2%;
-    left: 22%;
-    width: 36vw;
-    max-width: 150px;
+    left: 16%;
+    width: 32vw;
+    max-width: 140px;
+    --base-angle: 90deg;
     animation: leafWindB 7.5s infinite ease-in-out 0.5s;
   }
 
-  /* 偏中右压顶叶 */
-  .leaf-top-3 {
+  /* 11: 偏中下方垂叶 (顺时针旋转 90°) */
+  .leaf-top-11 {
     top: 1%;
-    right: 18%;
-    width: 38vw;
+    left: 40%;
+    width: 34vw;
+    max-width: 150px;
+    --base-angle: 90deg;
+    animation: leafWindA 5.8s infinite ease-in-out 1s;
+  }
+
+  /* 12: 偏右上压顶叶 (保持默认角度) */
+  .leaf-top-12 {
+    top: -1%;
+    right: 22%;
+    width: 33vw;
+    max-width: 145px;
+    --base-angle: 0deg;
+    animation: leafWindB 6.2s infinite ease-in-out 0.8s;
+  }
+
+  /* 13: 右上悬挂叶 (旋转 180°) */
+  .leaf-top-13 {
+    top: -3%;
+    right: 5%;
+    width: 36vw;
     max-width: 160px;
+    --base-angle: 180deg;
     animation: leafWindA 5.5s infinite ease-in-out 1.2s;
   }
 
-  /* 右上探出叶 */
-  .leaf-top-4 {
-    top: -4%;
+  /* 14: 最右上角探出叶 (微调角度自然过渡) */
+  .leaf-top-14 {
+    top: -6%;
     right: -10%;
-    width: 46vw;
-    max-width: 200px;
+    width: 42vw;
+    max-width: 185px;
+    --base-angle: -15deg;
     animation: leafWindB 6.8s infinite ease-in-out 0.2s;
   }
 }
 
-/* 微风轻摇自然动效 (全局添加) */
+/* 动态读取 --base-angle 的自然摇摆动画 */
 @keyframes leafWindA {
 
   0%,
   100% {
-    transform: rotate(-12deg) translateY(0px) scale(1);
+    transform: rotate(calc(var(--base-angle, 0deg) - 5deg)) translateY(0px) scale(1);
   }
 
   50% {
-    transform: rotate(-6deg) translateY(8px) scale(1.02);
+    transform: rotate(calc(var(--base-angle, 0deg) + 5deg)) translateY(7px) scale(1.02);
   }
 }
 
 @keyframes leafWindB {
-  0%, 100% {
-    transform: rotate(15deg) scaleX(-1) translateY(0px);
+
+  0%,
+  100% {
+    transform: rotate(calc(var(--base-angle, 0deg) + 6deg)) translateY(0px);
   }
+
   50% {
-    transform: rotate(21deg) scaleX(-1) translateY(10px);
+    transform: rotate(calc(var(--base-angle, 0deg) - 4deg)) translateY(9px);
   }
+
 }
 
 /* ========================================================
