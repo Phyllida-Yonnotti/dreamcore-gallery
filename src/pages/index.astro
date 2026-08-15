@@ -66,9 +66,10 @@ const LEAF_RIGHT_02_URL =
         alt="Top Banner Mobile"
       />
     </div>
-
     <!-- 居中照片 -->
     <div class="gallery-container">
+      <!-- photo No. -->
+      <div id="photo-no">0.</div>
       <!-- 1. 背景静止深邃叶墙（仅手机端显示） -->
       <div class="leaf-wall-bg"></div>
       <!-- 2. 中间照片容器 -->
@@ -79,26 +80,10 @@ const LEAF_RIGHT_02_URL =
       </div>
       <!-- 3. 前景遮挡与穿梭树叶层 -->
       <div class="leaf-overlay">
-        <img
-          src={LEAF_LEFT_01_URL}
-          class="leaf-item leaf-tl"
-          alt="leaf"
-        />
-        <img
-          src={LEAF_LEFT_01_URL}
-          class="leaf-item leaf-tr"
-          alt="leaf"
-        />
-        <img
-          src={LEAF_RIGHT_02_URL}
-          class="leaf-item leaf-bl"
-          alt="leaf"
-        />
-        <img
-          src={LEAF_RIGHT_02_URL}
-          class="leaf-item leaf-br"
-          alt="leaf"
-        />
+        <img src={LEAF_LEFT_01_URL} class="leaf-item leaf-tl" alt="leaf" />
+        <img src={LEAF_LEFT_01_URL} class="leaf-item leaf-tr" alt="leaf" />
+        <img src={LEAF_RIGHT_02_URL} class="leaf-item leaf-bl" alt="leaf" />
+        <img src={LEAF_RIGHT_02_URL} class="leaf-item leaf-br" alt="leaf" />
       </div>
       <!-- 4. 底部 Liked 控制栏 -->
       <div class="controls">

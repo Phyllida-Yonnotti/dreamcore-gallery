@@ -230,6 +230,11 @@ html {
   filter: brightness(0) invert(1) opacity(1);
 }
 
+#photo-no {
+  display: none;
+  color: white;
+}
+ 
 .like-count {
   color: #ffffff;
   font-size: 13px;
@@ -432,17 +437,25 @@ html {
     background-position: center top;
   }
 
+  #photo-no {
+    display: block;
+    position: absolute;
+    left: 0;
+  }
+
   /* 手机端适当放大图片，同时保留底部爱心控件的空间 */
   .image-wrapper {
     width: 92vw;
     height: 62vh;
     max-height: 540px;
+    margin-top: 20px;
   }
 
   /* 手机端隐藏左右切换按钮，让爱心自动居中 */
   .controls {
     justify-content: center;
     margin-top: 14px;
+    position: relative;
   }
 
   .btn {
