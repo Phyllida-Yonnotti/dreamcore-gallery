@@ -24,5 +24,8 @@
   },
   "devDependencies": {
     "@types/node": "^26.1.2"
+  },
+  "overrides": {
+    "q": "^1.5.1"
   }
 }
