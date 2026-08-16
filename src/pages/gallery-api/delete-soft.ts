@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    let dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL;
+    let dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING;
 
     if (!dbUrl) {
       throw new Error('未找到数据库连接环境变量 (DATABASE_URL / POSTGRES_URL)');
