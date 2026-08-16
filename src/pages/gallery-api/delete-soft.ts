@@ -1,8 +1,13 @@
 // src/pages/gallery-api/delete-soft.ts
 import type { APIRoute } from 'astro';
-import { neon } from '@neondatabase/serverless';
+import { createClient } from '@supabase/supabase-js';
 
 export const prerender = false;
+
+const supabase = createClient(
+  process.env.SUPABASE_URL || import.meta.env.SUPABASE_URL || '',
+  process.env.SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY || ''
+);
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -15,23 +20,15 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    let dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING;
+    // 将选中的图片在 Supabase 中更新 active_flag = false
+    const { data, error } = await supabase
+      .from('gallery_likes')
+      .update({ active_flag: false })
+      .in('img_url', ids);
 
-    if (!dbUrl) {
-      throw new Error('未找到数据库连接环境变量 (DATABASE_URL / POSTGRES_URL)');
+    if (error) {
+      throw error;
     }
-
-    if (dbUrl.startsWith('prisma://')) {
-      dbUrl = dbUrl.replace('prisma://', 'postgresql://');
-    }
-
-    const sql = neon(dbUrl);
-
-    await sql`
-      UPDATE "gallery-likes"
-      SET active_flag = false
-      WHERE img_url = ANY(${ids})
-    `;
 
     return new Response(
       JSON.stringify({ success: true, count: ids.length }),

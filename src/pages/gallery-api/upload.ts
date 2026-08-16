@@ -1,9 +1,15 @@
 // src/pages/gallery-api/upload.ts
 import type { APIRoute } from 'astro';
 import { put } from '@vercel/blob';
-import { neon } from '@neondatabase/serverless';
+import { createClient } from '@supabase/supabase-js';
 
 export const prerender = false;
+
+// 初始化 Supabase 客户端
+const supabase = createClient(
+  process.env.SUPABASE_URL || import.meta.env.SUPABASE_URL || '',
+  process.env.SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY || ''
+);
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -18,57 +24,39 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // 显式校验环境变量 Token 是否存在
     const token = process.env.BLOB_PUBLIC_READ_WRITE_TOKEN;
     if (!token) {
       return new Response(
-        JSON.stringify({ error: '环境变量未配置: 找不到 BLOB_PUBLIC_READ_WRITE_TOKEN，请前往 Vercel Redeploy 项目。' }),
+        JSON.stringify({ error: '环境变量未配置: 找不到 BLOB_PUBLIC_READ_WRITE_TOKEN' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    // 清理文件名中的多余扩展名
-    let cleanBaseName = customBaseName;
-    const userDotIndex = cleanBaseName.lastIndexOf('.');
-    if (userDotIndex !== -1) {
-      cleanBaseName = cleanBaseName.substring(0, userDotIndex);
-    }
-
-    // 校验英数字及符号
-    const validFileNameRegex = /^[a-zA-Z0-9_-]+$/;
-    if (!validFileNameRegex.test(cleanBaseName)) {
-      return new Response(
-        JSON.stringify({ error: '文件名只能包含英文字母、数字、半角横杠(-)和下划线(_)' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // 拼接原始后缀名
+    // 1. 清理文件名与拼接后缀
+    let cleanBaseName = customBaseName.replace(/\.[^/.]+$/, "");
     const lastDotIndex = file.name.lastIndexOf('.');
     const originalExt = lastDotIndex !== -1 ? file.name.substring(lastDotIndex + 1) : '';
     const finalFileName = originalExt ? `${cleanBaseName}.${originalExt}` : cleanBaseName;
 
-    // 传入 token 进行上传
+    // 2. 上传到 Vercel Blob (thai/ 目录下)
     const blob = await put(`thai/${finalFileName}`, file, {
       access: 'public',
+      allowOverwrite: true,
       addRandomSuffix: false,
       token: token
     });
 
-    // 将数据插入到数据库中 (以 Neon 为例)
-    let dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRES_PRISMA_URL;
-    if (dbUrl) {
-      if (dbUrl.startsWith('prisma://')) {
-        dbUrl = dbUrl.replace('prisma://', 'postgresql://');
-      }
-      const sql = neon(dbUrl);
+    // 3. 写入 Supabase 数据库
+    const { error: dbError } = await supabase
+      .from('gallery_likes')
+      .upsert(
+        { img_url: blob.url, active_flag: true },
+        { onConflict: 'img_url' }
+      );
 
-      // 向数据库插入初始点赞和状态记录
-      await sql`
-        INSERT INTO "gallery-likes" (img_url, count, active_flag)
-        VALUES (${blob.url}, 0, true)
-        ON CONFLICT (img_url) DO UPDATE SET active_flag = true
-      `;
+    if (dbError) {
+      console.error('Supabase 写入失败:', dbError);
+      throw new Error(`数据库写入失败: ${dbError.message}`);
     }
 
     return new Response(
@@ -76,7 +64,7 @@ export const POST: APIRoute = async ({ request }) => {
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error: any) {
-    console.error('上传 API 内部崩溃:', error);
+    console.error('上传 API 异常:', error);
     return new Response(
       JSON.stringify({ error: `[服务端错误] ${error.name || 'Error'}: ${error.message || '未知异常'}` }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }

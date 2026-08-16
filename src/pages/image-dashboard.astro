@@ -1,16 +1,16 @@
 ---
 import AdminLayout from '../layouts/AdminLayout.astro';
 import { list } from '@vercel/blob';
-import { neon } from '@neondatabase/serverless';
+import { createClient } from '@supabase/supabase-js';
 import { BLOB_PUBLIC_READ_WRITE_TOKEN } from 'astro:env/server';
 
 export const prerender = false;
 
 // 多重获取 Token
-const token = BLOB_PUBLIC_READ_WRITE_TOKEN || process.env.BLOB_PUBLIC_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN;
+const token = BLOB_PUBLIC_READ_WRITE_TOKEN || process.env.BLOB_PUBLIC_READ_WRITE_TOKEN;
 
 if (!token) {
-  throw new Error("本地环境变量缺失：未读取到任何有效的 BLOB Token，请检查 .env 文件并重启 dev 服务");
+  throw new Error("本地环境变量缺失：未读取到任何有效的 BLOB Token");
 }
 
 const IMAGE_REGEX = /\.(jpg|jpeg|png|webp|gif|svg|avif)$/i;
@@ -25,19 +25,23 @@ let activeImages = blobResponse.blobs.filter(blob =>
 );
 
 try {
-  // 初始化 sql 客户端
-  const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL!;
-  const sql = neon(dbUrl);
+  const supabase = createClient(
+    process.env.SUPABASE_URL || import.meta.env.SUPABASE_URL || '',
+    process.env.SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY || ''
+  );
 
-  // Neon 直接返回数据行数组，不再需要解构 { rows }
-  const rows = await sql`SELECT img_url, id FROM "gallery-likes" WHERE active_flag = false`;
+  // 从 Supabase 读取下架的图片
+  const { data: inactiveRows } = await supabase
+    .from('gallery_likes')
+    .select('img_url')
+    .eq('active_flag', false);
 
-  const inactiveUrls = new Set(rows.map((r: any) => r.img_url));
-
-  // 过滤掉已下架的图片
-  activeImages = activeImages.filter(blob => !inactiveUrls.has(blob.url));
+  if (inactiveRows) {
+    const inactiveUrls = new Set(inactiveRows.map((r: any) => r.img_url));
+    activeImages = activeImages.filter(blob => !inactiveUrls.has(blob.url));
+  }
 } catch (err) {
-  console.warn('读取数据库 active_flag 失败，显示完整 Blob 列表:', err);
+  console.warn('读取 Supabase active_flag 失败，显示完整 Blob 列表:', err);
 }
 ---
 
