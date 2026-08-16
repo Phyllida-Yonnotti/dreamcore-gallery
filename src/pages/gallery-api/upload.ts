@@ -48,7 +48,7 @@ export const POST: APIRoute = async ({ request }) => {
     const finalFileName = originalExt ? `${cleanBaseName}.${originalExt}` : cleanBaseName;
 
     // 5. 显式传入 token 进行上传
-    const blob = await put(`gallery/${finalFileName}`, file, {
+    const blob = await put(`thai/${finalFileName}`, file, {
       access: 'public',
       addRandomSuffix: false,
       token: token
