@@ -2,15 +2,27 @@
 import AdminLayout from '../layouts/AdminLayout.astro';
 import { list } from '@vercel/blob';
 import { neon } from '@neondatabase/serverless';
+import { BLOB_PUBLIC_READ_WRITE_TOKEN } from 'astro:env/server';
 
 export const prerender = false;
 
+// 💡 多重兜底获取 Token
+const token = BLOB_PUBLIC_READ_WRITE_TOKEN || process.env.BLOB_PUBLIC_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN;
+
+if (!token) {
+  throw new Error("本地环境变量缺失：未读取到任何有效的 BLOB Token，请检查 .env 文件并重启 dev 服务");
+}
+
+const IMAGE_REGEX = /\.(jpg|jpeg|png|webp|gif|svg|avif)$/i;
+
 const blobResponse = await list({ 
   prefix: 'thai/', 
-  token: process.env.BLOB_PUBLIC_READ_WRITE_TOKEN 
+  token: token
 });
 
-let activeImages = blobResponse.blobs;
+let activeImages = blobResponse.blobs.filter(blob => 
+  IMAGE_REGEX.test(blob.pathname)
+);
 
 try {
   // 初始化 sql 客户端
@@ -21,7 +33,9 @@ try {
   const rows = await sql`SELECT img_url, id FROM "gallery-likes" WHERE active_flag = false`;
 
   const inactiveUrls = new Set(rows.map((r: any) => r.img_url));
-  activeImages = blobResponse.blobs.filter(blob => !inactiveUrls.has(blob.url));
+
+  // 过滤掉已下架的图片
+  activeImages = activeImages.filter(blob => !inactiveUrls.has(blob.url));
 } catch (err) {
   console.warn('读取数据库 active_flag 失败，显示完整 Blob 列表:', err);
 }

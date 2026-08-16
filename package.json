@@ -5,6 +5,16 @@
   "engines": {
     "node": "24.*"
   },
+  "supportedArchitectures": {
+    "os": [
+      "current",
+      "linux"
+    ],
+    "cpu": [
+      "current",
+      "x64"
+    ]
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
