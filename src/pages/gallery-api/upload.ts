@@ -47,15 +47,33 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
     // 3. 写入 Supabase 数据库
-    const { error: dbError } = await supabase
+    const { data: existing } = await supabase
       .from('gallery_likes')
-      .upsert(
-        { img_url: blob.url, active_flag: true },
-        { onConflict: 'img_url' }
-      );
+      .select('id')
+      .eq('img_url', blob.url)
+      .maybeSingle();
+
+    let dbError;
+
+    if (existing) {
+      const { error } = await supabase
+        .from('gallery_likes')
+        .update({ active_flag: true })
+        .eq('id', existing.id);
+      dbError = error;
+    } else {
+      const { error } = await supabase
+        .from('gallery_likes')
+        .insert({
+          img_url: blob.url,
+          count: 0,
+          active_flag: true
+        });
+      dbError = error;
+    }
 
     if (dbError) {
-      console.error('Supabase 写入失败:', dbError);
+      console.error('Supabase 写入失败细节:', dbError);
       throw new Error(`数据库写入失败: ${dbError.message}`);
     }
 
