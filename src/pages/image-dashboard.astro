@@ -6,7 +6,7 @@ import { BLOB_PUBLIC_READ_WRITE_TOKEN } from 'astro:env/server';
 
 export const prerender = false;
 
-// 💡 多重兜底获取 Token
+// 多重获取 Token
 const token = BLOB_PUBLIC_READ_WRITE_TOKEN || process.env.BLOB_PUBLIC_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN;
 
 if (!token) {
@@ -269,7 +269,7 @@ try {
     deleteBtn?.addEventListener("click", async () => {
       if (selectedIds.size === 0) return;
 
-      const confirmMsg = `确定要下架选中的 ${selectedIds.size} 张图片吗？\n(注意：仅将 gallery-likes 表中的 active_flag 置为 false)`;
+      const confirmMsg = `确定要删除选中的 ${selectedIds.size} 张图片吗？\n`;
       if (!confirm(confirmMsg)) return;
 
       try {
@@ -285,10 +285,10 @@ try {
         const data = await res.json();
 
         if (res.ok) {
-          alert("下架成功！");
+          alert("删除成功！");
           window.location.reload();
         } else {
-          alert(`下架失败: ${data.error || "未知异常"}`);
+          alert(`删除失败: ${data.error || "未知异常"}`);
           deleteBtn.disabled = false;
           updateUI();
         }
