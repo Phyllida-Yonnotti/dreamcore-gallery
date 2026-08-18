@@ -200,7 +200,7 @@ async function fetchImages() {
 
       const onFirstLoad = () => {
         mainImg.src = currentItem.img_url;
-        
+
         // 同步首张图的点赞数 UI
         if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
         if (likeCheckbox) likeCheckbox.checked = false;
@@ -330,7 +330,7 @@ function updateDisplayWithLeafAnimation(
     // ----------------------------------------------------
     // 【向上滑动 / 下一张】：树叶向上方拨开，图片快速向上消失
     // ----------------------------------------------------
-    
+
     // 1. 树叶向两侧上方飘开
     tl.to(leftLeaves, { y: -70, x: -40, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
     tl.to(rightLeaves, { y: -70, x: 40, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
@@ -355,13 +355,13 @@ function updateDisplayWithLeafAnimation(
     // 4. 树叶从上方优雅飘落归位，并在完成后清除内联属性以恢复 CSS 摇摆
     tl.fromTo('.leaf-item',
       { y: -40, opacity: 0 },
-      { 
-        y: 0, 
-        opacity: 0.92, 
-        duration: 0.38, 
-        ease: 'back.out(1.2)', 
+      {
+        y: 0,
+        opacity: 0.92,
+        duration: 0.38,
+        ease: 'back.out(1.2)',
         stagger: 0.03,
-        clearProps: 'transform,opacity' 
+        clearProps: 'transform,opacity'
       },
       0.28
     );
@@ -370,7 +370,7 @@ function updateDisplayWithLeafAnimation(
     // ----------------------------------------------------
     // 【向下滑动 / 上一张】：树叶反向向下散开，图片向下消失
     // ----------------------------------------------------
-    
+
     // 1. 树叶向两侧下方散开 (反向)
     tl.to(leftLeaves, { y: 60, x: -35, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
     tl.to(rightLeaves, { y: 60, x: 35, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
@@ -395,13 +395,13 @@ function updateDisplayWithLeafAnimation(
     // 4. 树叶反向复位归位
     tl.fromTo('.leaf-item',
       { y: 40, opacity: 0 },
-      { 
-        y: 0, 
-        opacity: 0.92, 
-        duration: 0.38, 
-        ease: 'back.out(1.2)', 
+      {
+        y: 0,
+        opacity: 0.92,
+        duration: 0.38,
+        ease: 'back.out(1.2)',
         stagger: 0.03,
-        clearProps: 'transform,opacity' 
+        clearProps: 'transform,opacity'
       },
       0.28
     );
@@ -482,5 +482,28 @@ if (likeCheckbox) {
         console.error('点赞失败:', err);
       }
     }
+  });
+}
+
+const isDesktop = window.matchMedia('(pointer: fine)').matches;
+const bgBlur = document.getElementById('bg-blur');
+
+if (isDesktop && bgBlur) {
+
+  const INTENSITY = 30;
+
+  window.addEventListener('mousemove', (e) => {
+
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    const percentX = (e.clientX - centerX) / centerX;
+    const percentY = (e.clientY - centerY) / centerY;
+
+    const moveX = -percentX * INTENSITY;
+    const moveY = -percentY * INTENSITY;
+
+    bgBlur.style.setProperty('--mouse-x', `${moveX}px`);
+    bgBlur.style.setProperty('--mouse-y', `${moveY}px`);
   });
 }

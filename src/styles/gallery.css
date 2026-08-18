@@ -89,7 +89,8 @@ html {
   z-index: 1;
   /* 压暗 + 微模糊，保证中间画廊照片清晰 */
   filter: brightness(0.4) contrast(0.85) blur(0.5px);
-  transform: scale(1.02);
+  transform: scale(1.08) translate(var(--mouse-x, 0px), var(--mouse-y, 0px));
+  transition: transform 0.15s ease-out;
 
   /* 默认背景图片 */
   background-image: var(--bg-desktop);
