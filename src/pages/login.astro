@@ -1,0 +1,96 @@
+---
+// src/pages/login.astro
+import AdminLayout from "../layouts/AdminLayout.astro";
+import { createClient } from "@supabase/supabase-js";
+import "../styles/admin-custom.css";
+
+export const prerender = false;
+
+let errorMsg = "";
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const username = data.get("username")?.toString().trim();
+    const password = data.get("password")?.toString().trim();
+
+    const supabase = createClient(
+      process.env.SUPABASE_URL || import.meta.env.SUPABASE_URL || "",
+      process.env.SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY || "",
+    );
+
+    const { data: user } = await supabase
+      .from("admin_users")
+      .select("*")
+      .eq("username", username)
+      .eq("password", password)
+      .maybeSingle();
+
+    if (user) {
+      Astro.cookies.set("admin_token", "authenticated_user", {
+        path: "/",
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7,
+      });
+      return Astro.redirect("/admin");
+    } else {
+      errorMsg = "账号或密码错误！";
+    }
+  } catch (e: any) {
+    errorMsg = `登录失败: ${e.message}`;
+  }
+}
+---
+
+<AdminLayout title="管理账户登录">
+  <main class="admin-page-wrapper">
+    <div class="admin-card">
+      <h2 class="title">登录</h2>
+
+      {
+        errorMsg && (
+          <div
+            class="status-message"
+            style="color: #e55353; margin-bottom: 15px;"
+          >
+            {errorMsg}
+          </div>
+        )
+      }
+
+      <form method="POST">
+        <div class="form-group">
+          <div>
+            <label class="field-label">账户</label>
+            <br />
+            <input
+              type="text"
+              name="username"
+              class="custom-input"
+              placeholder="请输入管理员账号"
+              required
+              autocomplete="off"
+            />
+          </div>
+          <div>
+            <label class="field-label">密码</label>
+            <br />
+            <input
+              type="password"
+              name="password"
+              class="custom-input"
+              placeholder="请输入密码"
+              required
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="primary-btn"
+          style="width: 100%; padding: 13px; margin-top: 5px;">确认登录</button
+        >
+      </form>
+    </div>
+  </main>
+</AdminLayout>

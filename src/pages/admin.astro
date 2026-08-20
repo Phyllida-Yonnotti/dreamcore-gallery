@@ -1,0 +1,30 @@
+---
+// src/pages/admin.astro
+import AdminLayout from '../layouts/AdminLayout.astro';
+import '../styles/admin-custom.css';
+
+export const prerender = false;
+
+// 登录
+/*const token = Astro.cookies.get('admin_token')?.value;
+if (!token) {
+  return Astro.redirect('/login');
+}*/
+---
+
+<AdminLayout title="管理后台控制台">
+  <main class="admin-page-wrapper">
+    <div class="admin-card">
+      <h2 class="title">控制台</h2>
+
+      <div class="form-group" style="margin-top: 25px;">
+        <a href="/image-dashboard" class="danger-btn" style="text-align:center; padding:14px;">
+          删除图片
+        </a>
+        <a href="/upload" class="primary-btn" style="text-align:center; padding:14px;">
+          上传图片
+        </a>
+      </div>
+    </div>
+  </main>
+</AdminLayout>

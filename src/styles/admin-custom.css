@@ -1,0 +1,220 @@
+/* src/styles/admin-custom.css */
+
+/* 通用页面与卡片容器 */
+.admin-page-wrapper {
+  width: 100%;
+  max-width: 440px;
+  margin: 40px auto;
+}
+
+.admin-card {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 12px 32px 0 rgba(27, 67, 116, 0.12) !important;
+  border-radius: 16px;
+}
+
+/* 统一表单与按钮分组 */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* 通用输入框 */
+.custom-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid rgba(10, 106, 126, 0.25) !important;
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #1b4374;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.custom-input:focus {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: #1b4374 !important;
+  box-shadow: 0 0 12px rgba(27, 67, 116, 0.2) !important;
+}
+
+/* 上传拖拽区域 */
+.dropzone {
+  position: relative;
+  height: 120px;
+  border: 2px dashed rgba(10, 106, 126, 0.35);
+  border-radius: 8px;
+  background: rgba(244, 250, 250, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.dropzone:hover {
+  border-color: #1b4374;
+  background: rgba(10, 106, 126, 0.05);
+}
+
+.file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.dropzone-content {
+  text-align: center;
+  pointer-events: none;
+}
+
+.upload-icon {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+
+#file-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(91, 98, 103, 0.7);
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  color: rgba(91, 98, 103, 0.7);
+  font-size: 0.85rem;
+  text-decoration: none;
+  margin-top: 15px;
+}
+
+.back-link:hover {
+  color: #1b4374;
+}
+
+/* Dashboard 管理大厅样式 */
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #1b4374;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+}
+
+.subtitle {
+  margin: 5px 0 0 0;
+  font-size: 0.85rem;
+  color: rgba(91, 98, 103, 0.75);
+}
+
+.nav-link {
+  color: #214491;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 18px;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 0;
+  color: rgba(91, 98, 103, 0.6);
+}
+
+.img-card {
+  position: relative;
+  padding: 0 !important;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(10, 106, 126, 0.2);
+}
+
+.img-card:hover {
+  border-color: #1b4374;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(10, 106, 126, 0.15);
+}
+
+.img-card.selected {
+  border-color: #e55353;
+  box-shadow: 0 0 12px rgba(229, 83, 83, 0.3);
+  background: rgba(229, 83, 83, 0.05);
+}
+
+.checkbox-wrapper {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+}
+
+.card-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #e55353;
+  cursor: pointer;
+}
+
+.img-wrapper {
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+  background: #e1e8ed;
+}
+
+.img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.img-card:hover .img-wrapper img {
+  transform: scale(1.05);
+}
+
+.img-info {
+  padding: 10px;
+  font-size: 0.8rem;
+  color: #1b4374;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  background: rgba(244, 250, 250, 0.9);
+}
