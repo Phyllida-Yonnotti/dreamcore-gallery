@@ -507,3 +507,23 @@ if (isDesktop && bgBlur) {
     bgBlur.style.setProperty('--mouse-y', `${moveY}px`);
   });
 }
+
+// ========================================================
+// 菜单背景控制
+// ========================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const menuBtn = document.querySelector('.menu-icon');
+  const menuBg = document.getElementById('menu-bg');
+
+  if (menuBtn && menuBg) {
+    // 点击菜单图标时显示/切换全屏背景
+    menuBtn.addEventListener('click', () => {
+      menuBg.classList.toggle('is-active');
+    });
+
+    // （可选）点击背景本身时关闭全屏背景
+    menuBg.addEventListener('click', () => {
+      menuBg.classList.remove('is-active');
+    });
+  }
+});

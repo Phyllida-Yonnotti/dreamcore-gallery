@@ -25,6 +25,7 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 /* ========================================================
@@ -387,7 +388,7 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 15;
+  z-index: 10;
   pointer-events: none;
 }
 
@@ -426,25 +427,52 @@ html {
   display: none;
 }
 
-.menu-icon {
+.menu-container {
   display: flex;
   background-color: transparent;
   justify-content: center;
   align-items: center;
   width: 100%;
+  margin-top: 15px;
   margin-top: 30px;
   padding-bottom: 20px;
+  z-index: 10;
 }
 
-.menu-icon svg {
+.menu-container svg {
   opacity: 0.3;
   transform: scale(1);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.menu-icon svg:hover {
+.menu-container svg:hover {
   opacity: 0.9;
   transform: scale(1.05);
+}
+
+/* 菜单背景 */
+.menu-background {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background-color: #000000;
+  z-index: 99;
+  display: none;
+  /*opacity: 0;
+  transition: opacity 0.3s ease;*/
+}
+
+.menu-background.is-active {
+  display: block;
+  /*opacity: 1;*/
+}
+
+.menu-icon {
+  position: relative;
+  z-index: 100;
+  cursor: pointer;
 }
 
 /* ========================================================
