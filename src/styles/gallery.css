@@ -426,6 +426,27 @@ html {
   display: none;
 }
 
+.menu-icon {
+  display: flex;
+  background-color: transparent;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 30px;
+  padding-bottom: 20px;
+}
+
+.menu-icon svg {
+  opacity: 0.3;
+  transform: scale(1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.menu-icon svg:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
 /* ========================================================
    手机端 (屏幕宽度 <= 768px)
    ======================================================== */
@@ -462,6 +483,7 @@ html {
   }
 
   .top-banner-container {
+    display: none;
     top: 3%;
     width: 96vw;
     max-height: 70px;
