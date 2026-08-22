@@ -53,7 +53,14 @@ const LEAF_14_URL =
   "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/leaf-14.png";
 const LEAF_15_URL =
   "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/leaf-15.png";
-
+const FRAME_LEFT_BOTTOM_URL =
+  "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/left-hand-bottom.png";
+const FRAME_LEFT_TOP_URL =
+  "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/left-hand-top.png";
+const FRAME_RIGHT_BOTTOM_URL =
+  "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/right-hand-bottom.png";
+const FRAME_RIGHT_TOP_URL =
+  "https://hppuxb7qepdidfa2.public.blob.vercel-storage.com/parts/right-hand-top.png";
 ---
 
 <!-- 将 Layout 当作标签包裹住页面的具体内容 -->
@@ -102,7 +109,32 @@ const LEAF_15_URL =
       <!-- 2. 中间照片容器 -->
       <div class="card">
         <div class="image-wrapper">
+          <!-- 下方相框 -->
+          <img
+            class="frame-img left-frame bottom-frame"
+            src={FRAME_LEFT_BOTTOM_URL}
+            alt="frame-bottom-left"
+          />
+          <img
+            class="frame-img right-frame bottom-frame"
+            src={FRAME_RIGHT_BOTTOM_URL}
+            alt="frame-bottom-right"
+          />
+
+          <!-- 主图 -->
           <img id="main-img" src="" alt="Gallery Image" loading="eager" />
+
+          <!-- 上方相框 -->
+          <img
+            class="frame-img left-frame top-frame"
+            src={FRAME_LEFT_TOP_URL}
+            alt="frame-top-left"
+          />
+          <img
+            class="frame-img right-frame top-frame"
+            src={FRAME_RIGHT_TOP_URL}
+            alt="frame-top-right"
+          />
         </div>
       </div>
       <!-- 3. 前景遮挡与穿梭树叶层 -->
@@ -169,21 +201,92 @@ const LEAF_15_URL =
     </div>
     <!-- 菜单按钮 -->
     <div class="menu-container">
-      <div id="menu-bg" class="menu-background"><p style="color: white;">menu background</p></div>
+      <div id="menu-bg" class="menu-background">
+        <p style="color: white;">menu background</p>
+      </div>
       <div class="menu-icon">
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 48 48"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <!-- 第一排 -->
-          <rect x="3" y="3" width="11" height="11" rx="3" stroke="#ffffff" stroke-width="2.2"/>
-          <rect x="18.5" y="3" width="11" height="11" rx="3" stroke="#ffffff" stroke-width="2.2"/>
-          <rect x="34" y="3" width="11" height="11" rx="3" stroke="#ffffff" stroke-width="2.2"/>
+          <rect
+            x="3"
+            y="3"
+            width="11"
+            height="11"
+            rx="3"
+            stroke="#ffffff"
+            stroke-width="2.2"></rect>
+          <rect
+            x="18.5"
+            y="3"
+            width="11"
+            height="11"
+            rx="3"
+            stroke="#ffffff"
+            stroke-width="2.2"></rect>
+          <rect
+            x="34"
+            y="3"
+            width="11"
+            height="11"
+            rx="3"
+            stroke="#ffffff"
+            stroke-width="2.2"></rect>
           <!-- 第二排 -->
-          <rect x="3" y="18.5" width="11" height="11" rx="3" stroke="#ffffff" stroke-width="2.2"/>
-          <rect x="18.5" y="18.5" width="11" height="11" rx="3" stroke="#ffffff" stroke-width="2.2"/>
-          <rect x="34" y="18.5" width="11" height="11" rx="3" stroke="#ffffff" stroke-width="2.2"/>
+          <rect
+            x="3"
+            y="18.5"
+            width="11"
+            height="11"
+            rx="3"
+            stroke="#ffffff"
+            stroke-width="2.2"></rect>
+          <rect
+            x="18.5"
+            y="18.5"
+            width="11"
+            height="11"
+            rx="3"
+            stroke="#ffffff"
+            stroke-width="2.2"></rect>
+          <rect
+            x="34"
+            y="18.5"
+            width="11"
+            height="11"
+            rx="3"
+            stroke="#ffffff"
+            stroke-width="2.2"></rect>
           <!-- 第三排 -->
-          <rect x="3" y="34" width="11" height="11" rx="3" stroke="#ffffff" stroke-width="2.2"/>
-          <rect x="18.5" y="34" width="11" height="11" rx="3" stroke="#ffffff" stroke-width="2.2"/>
-          <rect x="34" y="34" width="11" height="11" rx="3" stroke="#ffffff" stroke-width="2.2"/>
+          <rect
+            x="3"
+            y="34"
+            width="11"
+            height="11"
+            rx="3"
+            stroke="#ffffff"
+            stroke-width="2.2"></rect>
+          <rect
+            x="18.5"
+            y="34"
+            width="11"
+            height="11"
+            rx="3"
+            stroke="#ffffff"
+            stroke-width="2.2"></rect>
+          <rect
+            x="34"
+            y="34"
+            width="11"
+            height="11"
+            rx="3"
+            stroke="#ffffff"
+            stroke-width="2.2"></rect>
         </svg>
       </div>
     </div>
