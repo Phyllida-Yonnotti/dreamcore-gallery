@@ -144,34 +144,13 @@ html {
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55);
   will-change: transform, opacity;
 
-  /* 骨架屏占位底色与渐变动画 */
+  /* 设定摆动中心点：下方 */
+  transform-origin: 50% 120%;
+
+  /* 骨架屏占位底色 */
   background: linear-gradient(90deg, #12161f 25%, #1e2533 50%, #12161f 75%);
   background-size: 200% 100%;
   animation: skeletonShimmer 2s infinite ease-in-out;
-}
-
-/* 图片退场动画优化 */
-.image-wrapper.exit-up {
-  transform: translateY(-100px) scale(0.92);
-  opacity: 0;
-  /* 0.22s 快速淡出，配合 ease-in 在结尾迅速消失，不拖泥带水 */
-  transition:
-    transform 0.3s cubic-bezier(0.2, 0, 0.1, 1),
-    opacity 0.22s ease-in;
-}
-
-/* 图片进场动画 */
-.image-wrapper.enter-from-down {
-  transform: translateY(80px) scale(0.95);
-  opacity: 0;
-}
-
-.image-wrapper.enter-active {
-  transform: translateY(0) scale(1);
-  opacity: 1;
-  transition:
-    transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-    opacity 0.25s ease-out;
 }
 
 @keyframes skeletonShimmer {
@@ -497,6 +476,7 @@ html {
     height: 62vh;
     max-height: 540px;
     margin-top: 20px;
+    transform-origin: 50% 120%;
   }
 
   /* 手机端隐藏左右切换按钮，让爱心自动居中 */
@@ -636,32 +616,6 @@ html {
     animation: leafWindB 6.8s infinite ease-in-out 0.2s;
   }
 
-  /* 上滑手势：树叶向上/向两侧拨开 */
-  .swipe-up .leaf-top-9,
-  .swipe-up .leaf-top-10,
-  .swipe-up .leaf-top-11 {
-    animation: leafFlyUpLeft 0.4s cubic-bezier(0.2, 0, 0.2, 1) forwards !important;
-  }
-
-  .swipe-up .leaf-top-12,
-  .swipe-up .leaf-top-13,
-  .swipe-up .leaf-top-14 {
-    animation: leafFlyUpRight 0.4s cubic-bezier(0.2, 0, 0.2, 1) forwards !important;
-  }
-
-  /* 下滑手势：使用同一个 Keyframe 关键帧，通过 reverse 倒序播放 */
-  .swipe-down .leaf-top-9,
-  .swipe-down .leaf-top-10,
-  .swipe-down .leaf-top-11 {
-    animation: leafFlyUpLeft 0.4s cubic-bezier(0.2, 0, 0.2, 1) reverse forwards !important;
-  }
-
-  .swipe-down .leaf-top-12,
-  .swipe-down .leaf-top-13,
-  .swipe-down .leaf-top-14 {
-    animation: leafFlyUpRight 0.4s cubic-bezier(0.2, 0, 0.2, 1) reverse forwards !important;
-  }
-
   /* 动态读取 --base-angle 的自然摇摆动画 */
   @keyframes leafWindA {
 
@@ -688,29 +642,6 @@ html {
 
   }
 
-  @keyframes leafFlyUpLeft {
-    0% {
-      transform: rotate(calc(var(--base-angle, 0deg))) translateY(0) scale(1);
-      opacity: 0.92;
-    }
-
-    100% {
-      transform: rotate(calc(var(--base-angle, 0deg) - 25deg)) translateY(-60px) translateX(-30px) scale(1.08);
-      opacity: 0;
-    }
-  }
-
-  @keyframes leafFlyUpRight {
-    0% {
-      transform: rotate(calc(var(--base-angle, 0deg))) translateY(0) scale(1);
-      opacity: 0.92;
-    }
-
-    100% {
-      transform: rotate(calc(var(--base-angle, 0deg) + 25deg)) translateY(-60px) translateX(30px) scale(1.08);
-      opacity: 0;
-    }
-  }
 }
 
 /* ========================================================

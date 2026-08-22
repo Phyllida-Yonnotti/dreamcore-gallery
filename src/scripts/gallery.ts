@@ -23,27 +23,18 @@ const subtitle = document.querySelector('.subtitle-container') as HTMLElement;
 const likeCheckbox = document.getElementById('like-checkbox') as HTMLInputElement;
 const likeCountEl = document.getElementById('like-count');
 
-let isReadyToOpen = false; // 标记首张图是否完全加载完成
-let isAnimating = false;  // 状态锁：防止快速滑动导致动画重叠
+let isReadyToOpen = false; 
+let isAnimating = false;  
 
 // ========================================================
 // 水光涟漪引擎
 // ========================================================
 interface WaterRing {
-  x: number;
-  y: number;
-  radius: number;
-  maxRadius: number;
-  alpha: number;
-  lineWidth: number;
-  speed: number;
+  x: number; y: number; radius: number; maxRadius: number;
+  alpha: number; lineWidth: number; speed: number;
 }
-
 interface WaterGlow {
-  x: number;
-  y: number;
-  radius: number;
-  alpha: number;
+  x: number; y: number; radius: number; alpha: number;
 }
 
 let rings: WaterRing[] = [];
@@ -62,12 +53,10 @@ resizeCanvas();
 
 function createRipple(x: number, y: number, isClick = false) {
   const count = isClick ? 3 : 1;
-
   for (let i = 0; i < count; i++) {
     setTimeout(() => {
       rings.push({
-        x,
-        y,
+        x, y,
         radius: isClick ? 10 : 2,
         maxRadius: isClick ? 180 + i * 40 : 50,
         alpha: isClick ? 0.45 : 0.2,
@@ -76,20 +65,14 @@ function createRipple(x: number, y: number, isClick = false) {
       });
     }, i * 120);
   }
-
-  if (isClick) {
-    glows.push({ x, y, radius: 10, alpha: 0.25 });
-  }
+  if (isClick) glows.push({ x, y, radius: 10, alpha: 0.25 });
 }
 
 function renderFrame() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   ambientTimer++;
   if (!isOpening && ambientTimer % 180 === 0) {
-    const rx = Math.random() * canvas.width;
-    const ry = Math.random() * canvas.height;
-    createRipple(rx, ry, false);
+    createRipple(Math.random() * canvas.width, Math.random() * canvas.height, false);
   }
 
   for (let i = glows.length - 1; i >= 0; i--) {
@@ -97,58 +80,44 @@ function renderFrame() {
     const grad = ctx.createRadialGradient(g.x, g.y, 0, g.x, g.y, g.radius);
     grad.addColorStop(0, `rgba(255, 255, 255, ${g.alpha})`);
     grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
     ctx.beginPath();
     ctx.arc(g.x, g.y, g.radius, 0, Math.PI * 2);
     ctx.fillStyle = grad;
     ctx.fill();
-
     g.radius += 2.5;
     g.alpha -= 0.008;
-
     if (g.alpha <= 0) glows.splice(i, 1);
   }
 
   for (let i = rings.length - 1; i >= 0; i--) {
     const r = rings[i];
-
     ctx.beginPath();
     ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
     ctx.strokeStyle = `rgba(255, 255, 255, ${r.alpha})`;
     ctx.lineWidth = r.lineWidth;
     ctx.stroke();
-
     r.radius += r.speed;
     r.lineWidth = Math.max(0.2, r.lineWidth - 0.005);
     r.alpha -= 0.006;
-
-    if (r.alpha <= 0 || r.radius >= r.maxRadius) {
-      rings.splice(i, 1);
-    }
+    if (r.alpha <= 0 || r.radius >= r.maxRadius) rings.splice(i, 1);
   }
-
   animId = requestAnimationFrame(renderFrame);
 }
-
 renderFrame();
 
 // ========================================================
 // 点击水面开场
 // ========================================================
-splash.addEventListener('click', (e: MouseEvent) => {
+splash?.addEventListener('click', (e: MouseEvent) => {
   if (!isReadyToOpen) {
     createRipple(e.clientX, e.clientY, false);
     return;
   }
-
   if (isOpening) return;
   isOpening = true;
 
   const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
-
-  createRipple(clickX, clickY, true);
+  createRipple(e.clientX - rect.left, e.clientY - rect.top, true);
 
   gsap.to(splash, {
     opacity: 0,
@@ -171,17 +140,10 @@ splash.addEventListener('click', (e: MouseEvent) => {
     { y: -25, opacity: 0 },
     { y: 0, opacity: 1, duration: 1.0, delay: 0.3, ease: 'power2.out' }
   );
-
-  if (subtitle) {
-    gsap.fromTo(subtitle,
-      { y: -15, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.9, delay: 0.35, ease: 'power2.out' }
-    );
-  }
 });
 
 // ========================================================
-// 画廊 API 与预加载逻辑
+// 画廊 API 与预加载
 // ========================================================
 async function fetchImages() {
   try {
@@ -194,29 +156,22 @@ async function fetchImages() {
 
     if (Array.isArray(images) && images.length > 0) {
       const currentItem = images[currentIndex];
-
       const firstImg = new Image();
       firstImg.src = currentItem.img_url;
 
       const onFirstLoad = () => {
         mainImg.src = currentItem.img_url;
-
-        // 同步首张图的点赞数 UI
         if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
         if (likeCheckbox) likeCheckbox.checked = false;
 
         gsap.to(mainImg, { opacity: 1, duration: 0.4 });
-
         isReadyToOpen = true;
         if (splashHint) splashHint.innerHTML = "点击静水 · 开启画廊";
         preloadAdjacentImages();
       };
 
-      if (firstImg.complete) {
-        onFirstLoad();
-      } else {
-        firstImg.onload = onFirstLoad;
-      }
+      if (firstImg.complete) onFirstLoad();
+      else firstImg.onload = onFirstLoad;
     }
   } catch (err) {
     console.error('❌ 无法从 API 加载图片:', err);
@@ -229,37 +184,22 @@ function preloadAdjacentImages() {
   const nextIndex = (currentIndex + 1) % images.length;
   const prevIndex = (currentIndex - 1 + images.length) % images.length;
 
-  const imgNext = new Image();
-  imgNext.src = images[nextIndex].img_url;
-  const imgPrev = new Image();
-  imgPrev.src = images[prevIndex].img_url;
+  new Image().src = images[nextIndex].img_url;
+  new Image().src = images[prevIndex].img_url;
 }
 
 // ========================================================
-// 桌面端：渐隐平滑切图逻辑
+// 桌面端：渐隐平滑切图
 // ========================================================
-function updateDisplay(
-  index: number,
-  isInitial = false,
-  direction: 'next' | 'prev' = 'next'
-) {
+function updateDisplay(index: number) {
   if (images.length === 0 || isAnimating) return;
   isAnimating = true;
 
   currentIndex = (index + images.length) % images.length;
   const currentItem = images[currentIndex];
-  const currentUrl = currentItem.img_url;
 
-  // 刷新当前图的点赞 UI 状态
   if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
   if (likeCheckbox) likeCheckbox.checked = false;
-
-  if (isInitial) {
-    mainImg.src = currentUrl;
-    preloadAdjacentImages();
-    isAnimating = false;
-    return;
-  }
 
   gsap.to('.image-wrapper', {
     opacity: 0.2,
@@ -267,40 +207,25 @@ function updateDisplay(
     duration: 0.15,
     ease: 'power1.in',
     onComplete: () => {
-      const tempImg = new Image();
-      tempImg.src = currentUrl;
-
-      const renderNewImage = () => {
-        mainImg.src = currentUrl;
-
-        gsap.fromTo('.image-wrapper',
-          { opacity: 0.2, scale: 0.98 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 0.28,
-            ease: 'power2.out',
-            onComplete: () => {
-              isAnimating = false;
-              preloadAdjacentImages();
-            }
-          }
-        );
-      };
-
-      if (tempImg.complete) {
-        renderNewImage();
-      } else {
-        tempImg.onload = renderNewImage;
-      }
+      mainImg.src = currentItem.img_url;
+      gsap.to('.image-wrapper', {
+        opacity: 1,
+        scale: 1,
+        duration: 0.25,
+        ease: 'power2.out',
+        onComplete: () => {
+          isAnimating = false;
+          preloadAdjacentImages();
+        }
+      });
     }
   });
 }
 
 // ========================================================
-// 手机端：树叶联动 + 干脆利落切图逻辑
+// 移动端：双向圆周弧线摆动切图
 // ========================================================
-function updateDisplayWithLeafAnimation(
+function updateDisplayWithArcAnimation(
   newIndex: number,
   direction: 'next' | 'prev'
 ) {
@@ -309,123 +234,83 @@ function updateDisplayWithLeafAnimation(
 
   currentIndex = (newIndex + images.length) % images.length;
   const currentItem = images[currentIndex];
-  const nextImageUrl = currentItem.img_url;
 
-  // 刷新点赞 UI
   if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
   if (likeCheckbox) likeCheckbox.checked = false;
 
-  // 树叶分组：左侧三片 (9, 10, 11) 与 右侧三片 (12, 13, 14)
-  const leftLeaves = '.leaf-top-9, .leaf-top-10, .leaf-top-11';
-  const rightLeaves = '.leaf-top-12, .leaf-top-13, .leaf-top-14';
+  const origin = "50% 120%"; 
+  const exitAngle = direction === 'next' ? -25 : 25; 
+  const enterAngle = direction === 'next' ? 25 : -25; 
+  const wrapper = document.querySelector('.image-wrapper');
+  if (!wrapper) return;
 
-  const tl = gsap.timeline({
+  // 1. 旧图做圆周弧线离场
+  gsap.to(wrapper, {
+    transformOrigin: origin,
+    rotate: exitAngle,
+    x: direction === 'next' ? -60 : 60,
+    opacity: 0,
+    duration: 0.22,
+    ease: 'power1.in',
     onComplete: () => {
-      isAnimating = false;
-      preloadAdjacentImages();
+      // 2. 更换图片
+      mainImg.src = currentItem.img_url;
+
+      // 3. 将新图瞬间定位到进场摆动点
+      gsap.set(wrapper, {
+        transformOrigin: origin,
+        rotate: enterAngle,
+        x: direction === 'next' ? 60 : -60,
+        opacity: 0
+      });
+
+      // 4. 新图做圆周弧线摆动进场复位
+      gsap.to(wrapper, {
+        rotate: 0,
+        x: 0,
+        opacity: 1,
+        duration: 0.32,
+        ease: 'back.out(1.1)',
+        onComplete: () => {
+          isAnimating = false;
+          preloadAdjacentImages();
+        }
+      });
     }
   });
-
-  if (direction === 'next') {
-    // ----------------------------------------------------
-    // 【向上滑动 / 下一张】：树叶向上方拨开，图片快速向上消失
-    // ----------------------------------------------------
-
-    // 1. 树叶向两侧上方飘开
-    tl.to(leftLeaves, { y: -70, x: -40, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
-    tl.to(rightLeaves, { y: -70, x: 40, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
-
-    // 2. 旧图片迅速向上淡出 (0.2s 极速，不卡顿)
-    tl.to('.image-wrapper', {
-      y: -50,
-      opacity: 0,
-      scale: 0.94,
-      duration: 0.20,
-      ease: 'power1.in',
-      onComplete: () => { mainImg.src = nextImageUrl; }
-    }, 0);
-
-    // 3. 新图片从下方轻盈推入
-    tl.fromTo('.image-wrapper',
-      { y: 50, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.32, ease: 'power2.out' },
-      0.22
-    );
-
-    // 4. 树叶从上方优雅飘落归位，并在完成后清除内联属性以恢复 CSS 摇摆
-    tl.fromTo('.leaf-item',
-      { y: -40, opacity: 0 },
-      {
-        y: 0,
-        opacity: 0.92,
-        duration: 0.38,
-        ease: 'back.out(1.2)',
-        stagger: 0.03,
-        clearProps: 'transform,opacity'
-      },
-      0.28
-    );
-
-  } else {
-    // ----------------------------------------------------
-    // 【向下滑动 / 上一张】：树叶反向向下散开，图片向下消失
-    // ----------------------------------------------------
-
-    // 1. 树叶向两侧下方散开 (反向)
-    tl.to(leftLeaves, { y: 60, x: -35, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
-    tl.to(rightLeaves, { y: 60, x: 35, opacity: 0, duration: 0.28, ease: 'power2.in' }, 0);
-
-    // 2. 旧图片迅速向下淡出
-    tl.to('.image-wrapper', {
-      y: 50,
-      opacity: 0,
-      scale: 0.94,
-      duration: 0.20,
-      ease: 'power1.in',
-      onComplete: () => { mainImg.src = nextImageUrl; }
-    }, 0);
-
-    // 3. 新图片从上方掉落进来
-    tl.fromTo('.image-wrapper',
-      { y: -50, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.32, ease: 'power2.out' },
-      0.22
-    );
-
-    // 4. 树叶反向复位归位
-    tl.fromTo('.leaf-item',
-      { y: 40, opacity: 0 },
-      {
-        y: 0,
-        opacity: 0.92,
-        duration: 0.38,
-        ease: 'back.out(1.2)',
-        stagger: 0.03,
-        clearProps: 'transform,opacity'
-      },
-      0.28
-    );
-  }
 }
 
-// ========================================================
-// 交互绑定
-// ========================================================
-
+// 统一切图路由
 function changeSlide(direction: 'next' | 'prev') {
   const isMobile = window.innerWidth <= 768;
   const targetIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
 
   if (isMobile) {
-    updateDisplayWithLeafAnimation(targetIndex, direction);
+    updateDisplayWithArcAnimation(targetIndex, direction);
   } else {
-    updateDisplay(targetIndex, false, direction);
+    updateDisplay(targetIndex);
   }
 }
 
-prevBtn.addEventListener('click', () => changeSlide('prev'));
-nextBtn.addEventListener('click', () => changeSlide('next'));
+// ========================================================
+// 绑定桌面端控制按钮与键盘监听
+// ========================================================
+if (prevBtn) {
+  prevBtn.addEventListener('click', () => changeSlide('prev'));
+}
+if (nextBtn) {
+  nextBtn.addEventListener('click', () => changeSlide('next'));
+}
 
+window.addEventListener('keydown', (e: KeyboardEvent) => {
+  if (!isOpening) return;
+  if (e.key === 'ArrowLeft') changeSlide('prev');
+  if (e.key === 'ArrowRight') changeSlide('next');
+});
+
+// ========================================================
+// 移动端左右手势监听
+// ========================================================
 let touchStartY = 0;
 let touchStartX = 0;
 
@@ -437,40 +322,28 @@ window.addEventListener('touchstart', (e: TouchEvent) => {
 
 window.addEventListener('touchend', (e: TouchEvent) => {
   if (!isOpening) return;
-  const touchEndY = e.changedTouches[0].clientY;
-  const touchEndX = e.changedTouches[0].clientX;
+  const deltaX = touchStartX - e.changedTouches[0].clientX;
+  const deltaY = Math.abs(touchStartY - e.changedTouches[0].clientY);
 
-  const deltaY = touchStartY - touchEndY;
-  const deltaX = Math.abs(touchStartX - touchEndX);
-  const minSwipeDistance = 35;
-
-  if (Math.abs(deltaY) > minSwipeDistance && Math.abs(deltaY) > deltaX) {
-    if (deltaY > 0) {
-      changeSlide('next'); // 上滑 -> 下一张
-    } else {
-      changeSlide('prev'); // 下滑 -> 上一张
-    }
+  if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > deltaY) {
+    if (deltaX > 0) changeSlide('next');
+    else changeSlide('prev');
   }
 }, { passive: true });
 
-// 初始化加载图片列表
-fetchImages();
-
 // ========================================================
-// 单图独立点赞功能
+// 点赞与菜单逻辑
 // ========================================================
 if (likeCheckbox) {
   likeCheckbox.addEventListener('change', async () => {
     if (likeCheckbox.checked && images[currentIndex]) {
       const currentItem = images[currentIndex];
-
       try {
         const res = await fetch('/gallery-api/likes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: currentItem.id })
         });
-
         if (res.ok) {
           const data = await res.json();
           if (data.count !== undefined) {
@@ -485,45 +358,14 @@ if (likeCheckbox) {
   });
 }
 
-const isDesktop = window.matchMedia('(pointer: fine)').matches;
-const bgBlur = document.getElementById('bg-blur');
-
-if (isDesktop && bgBlur) {
-
-  const INTENSITY = 30;
-
-  window.addEventListener('mousemove', (e) => {
-
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-
-    const percentX = (e.clientX - centerX) / centerX;
-    const percentY = (e.clientY - centerY) / centerY;
-
-    const moveX = -percentX * INTENSITY;
-    const moveY = -percentY * INTENSITY;
-
-    bgBlur.style.setProperty('--mouse-x', `${moveX}px`);
-    bgBlur.style.setProperty('--mouse-y', `${moveY}px`);
-  });
-}
-
-// ========================================================
-// 菜单背景控制
-// ========================================================
 document.addEventListener('DOMContentLoaded', () => {
   const menuBtn = document.querySelector('.menu-icon');
   const menuBg = document.getElementById('menu-bg');
-
   if (menuBtn && menuBg) {
-    // 点击菜单图标时显示/切换全屏背景
-    menuBtn.addEventListener('click', () => {
-      menuBg.classList.toggle('is-active');
-    });
-
-    // （可选）点击背景本身时关闭全屏背景
-    menuBg.addEventListener('click', () => {
-      menuBg.classList.remove('is-active');
-    });
+    menuBtn.addEventListener('click', () => menuBg.classList.toggle('is-active'));
+    menuBg.addEventListener('click', () => menuBg.classList.remove('is-active'));
   }
 });
+
+// 启动数据请求
+fetchImages();
