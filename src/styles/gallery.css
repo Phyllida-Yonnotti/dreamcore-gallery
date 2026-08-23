@@ -663,6 +663,7 @@ html {
     width: auto;
     height: auto;
     transform: scale(0.3);
+    display: block;
   }
 
   .bottom-frame {
@@ -674,15 +675,17 @@ html {
   }
 
   .left-frame {
-    left: -20%;
+    left: 0;
     bottom: 0;
-    transform-origin: left bottom;
+    transform-origin: 48% 40%;
+    transform: translate(-60%, 40%) scale(0.5);
   }
 
   .right-frame {
-    right: -20%;
+    right: 0;
     bottom: 0;
-    transform-origin: right bottom;
+    transform-origin: 52% 40%;
+    transform: translate(60%, 40%) scale(0.5);
   }
 }
 
