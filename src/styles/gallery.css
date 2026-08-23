@@ -113,7 +113,7 @@ html {
    正中间画廊照片
    ======================================================== */
 .gallery-container {
-  margin: 25px 0 0 0;
+  margin: 12% 0 0 0;
   position: relative;
   z-index: 10;
   display: flex;
@@ -190,32 +190,25 @@ html {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  /* 顶部对齐：保证左右箭头与爱心图标对齐，数字顺延留在下方 */
   width: 100%;
   margin-top: 18px;
   padding: 0 12px;
   position: relative;
   z-index: 30;
-  /* 统一图标高度控制：修改此数值即可同时改变左右箭头和爱心的大小 */
-  --icon-height: 38px;
+  --icon-height: 36px;
 }
 
-/* PNG 按钮基础重置与高度绑定 */
 .btn {
   background: transparent;
-  /* 移除原有的白圈背景 */
   border: none;
   padding: 0;
   height: var(--icon-height);
-  /* 强制高度与爱心一致 */
   width: auto;
-  /* 宽度按 PNG 图片比例自动自适应 */
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   box-shadow: none;
-  /* 移除按钮阴影 */
   transition: transform 0.2s ease, filter 0.2s ease;
   user-select: none;
 }
@@ -223,14 +216,11 @@ html {
 .btn:hover {
   background: transparent;
   transform: scale(1.12);
-  /* 悬停微放大 */
   filter: brightness(1.2);
-  /* 悬停微微亮起 */
 }
 
 .btn:active {
   transform: scale(0.92);
-  /* 点击微按压 */
 }
 
 .btn img {
@@ -239,7 +229,6 @@ html {
   object-fit: contain;
   pointer-events: none;
 
-  /* 左右按键：纯白 + 半透明 */
   filter: brightness(0) invert(1) opacity(0.65);
   transition: transform 0.25s ease, filter 0.25s ease;
 }
@@ -253,34 +242,29 @@ html {
   color: white;
 }
 
-.like-count {
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-  user-select: none;
-}
-
 /* ========================================================
    From Uiverse.io by catraco (爱心动画样式)
    ======================================================== */
-/* 爱心+数字外层包装 */
 .heart-wrapper {
+  position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  margin: -4px auto 0;
+  width: fit-content;
 }
 
-/* 爱心图标容器：高度与变量绑定 */
 .heart-container {
   --heart-color: rgb(255, 91, 137);
   position: relative;
   width: var(--icon-height);
-  /* 强制同高同宽 */
   height: var(--icon-height);
-  /* 强制同高同宽 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   transition: .3s;
+  line-height: 0;
 }
 
 .heart-container .checkbox {
@@ -288,7 +272,7 @@ html {
   width: 100%;
   height: 100%;
   opacity: 0;
-  z-index: 20;
+  z-index: 2;
   cursor: pointer;
 }
 
@@ -329,6 +313,22 @@ html {
   display: block;
 }
 
+.like-count {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  font-family: "Gill Sans", sans-serif;
+  margin-left: 8px;/* 爱心与数字的间距 */
+  padding: 0;
+  white-space: nowrap;/* 避免数字位数变长时换行 */
+}
+
 @keyframes keyframes-svg-filled {
   0% {
     transform: scale(0);
@@ -366,28 +366,27 @@ html {
    ======================================================== */
 .top-banner-container {
   position: absolute;
-  top: 2%;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
 
-  /* 宽度设为 96vw（最大 1050px），确保比画廊照片 (max-width: 850px) 宽一截 */
-  width: 95vw;
+  width: 98vw;
   max-width: 1200px !important;
 
   height: auto;
-  max-height: 140px;
+  max-height: 200px;
 
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
+  z-index: 1;
   pointer-events: none;
 }
 
 .top-banner-img {
   width: 100%;
   height: auto;
-  max-height: 140px;
+  max-height: 200px;
   object-fit: contain;
 
   user-select: none;
