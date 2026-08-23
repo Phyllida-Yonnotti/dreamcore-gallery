@@ -122,12 +122,27 @@ html {
 }
 
 .card {
+  position: relative;
   background: transparent;
   padding: 0;
   box-shadow: none;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+#photo-no {
+  display: block;
+  position: absolute;
+  top: -22px;
+  left: 0;
+  z-index: 1;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: "Gill Sans", sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  user-select: none;
 }
 
 .image-wrapper {
@@ -235,11 +250,6 @@ html {
 
 .btn:hover img {
   filter: brightness(0) invert(1) opacity(1);
-}
-
-#photo-no {
-  display: none;
-  color: white;
 }
 
 /* ========================================================
@@ -476,12 +486,6 @@ html {
     background-position: center top;
   }
 
-  #photo-no {
-    display: block;
-    position: absolute;
-    left: 0;
-  }
-
   /* 手机端适当放大图片，同时保留底部爱心控件的空间 */
   .image-wrapper {
     width: 92vw;
@@ -541,6 +545,10 @@ html {
     z-index: 10;
   }
 
+  #photo-no {
+    left: 50%;
+    transform: translateX(-50%);
+  }
   .gallery-container {
     position: relative;
     z-index: 10;

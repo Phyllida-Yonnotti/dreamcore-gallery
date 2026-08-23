@@ -19,6 +19,9 @@ const prevBtn = document.getElementById('prev-btn')!;
 const nextBtn = document.getElementById('next-btn')!;
 const subtitle = document.querySelector('.subtitle-container') as HTMLElement;
 
+// 获取图片编号 DOM
+const photoNoEl = document.getElementById('photo-no');
+
 // 点赞相关 DOM 元素
 const likeCheckbox = document.getElementById('like-checkbox') as HTMLInputElement;
 const likeCountEl = document.getElementById('like-count');
@@ -161,6 +164,8 @@ async function fetchImages() {
 
       const onFirstLoad = () => {
         mainImg.src = currentItem.img_url;
+        // 1. 设置 Supabase 中的 ID
+        if (photoNoEl) photoNoEl.textContent = `${currentItem.id}.`;
         if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
         if (likeCheckbox) likeCheckbox.checked = false;
 
@@ -198,6 +203,8 @@ function updateDisplay(index: number) {
   currentIndex = (index + images.length) % images.length;
   const currentItem = images[currentIndex];
 
+  // 2. 更新 ID 编号
+  if (photoNoEl) photoNoEl.textContent = `${currentItem.id}.`;
   if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
   if (likeCheckbox) likeCheckbox.checked = false;
 
@@ -235,6 +242,8 @@ function updateDisplayWithArcAnimation(
   currentIndex = (newIndex + images.length) % images.length;
   const currentItem = images[currentIndex];
 
+  // 3. 更新 ID 编号
+  if (photoNoEl) photoNoEl.textContent = `${currentItem.id}.`;
   if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
   if (likeCheckbox) likeCheckbox.checked = false;
 
