@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 // 1. 定义图片数据接口
 interface ImageItem {
   id: string | number;
+  display_index: number;
   img_url: string;
   count: number;
 }
@@ -153,7 +154,7 @@ async function fetchImages() {
     if (splashHint) splashHint.innerHTML = "静水沉淀中...";
     if (mainImg) mainImg.style.opacity = '0';
 
-    const response = await fetch('/gallery-api/images');
+    const response = await fetch('/gallery-api/images', { cache: 'no-store' });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     images = await response.json();
 
@@ -165,7 +166,7 @@ async function fetchImages() {
       const onFirstLoad = () => {
         mainImg.src = currentItem.img_url;
         // 1. 设置 Supabase 中的 ID
-        if (photoNoEl) photoNoEl.textContent = `${currentItem.id}.`;
+        if (photoNoEl) photoNoEl.textContent = `${currentItem.display_index}.`;
         if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
         if (likeCheckbox) likeCheckbox.checked = false;
 
@@ -204,7 +205,7 @@ function updateDisplay(index: number) {
   const currentItem = images[currentIndex];
 
   // 2. 更新 ID 编号
-  if (photoNoEl) photoNoEl.textContent = `${currentItem.id}.`;
+  if (photoNoEl) photoNoEl.textContent = `${currentItem.display_index}.`;
   if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
   if (likeCheckbox) likeCheckbox.checked = false;
 
@@ -243,7 +244,7 @@ function updateDisplayWithArcAnimation(
   const currentItem = images[currentIndex];
 
   // 3. 更新 ID 编号
-  if (photoNoEl) photoNoEl.textContent = `${currentItem.id}.`;
+  if (photoNoEl) photoNoEl.textContent = `${currentItem.display_index}.`;
   if (likeCountEl) likeCountEl.textContent = currentItem.count.toString();
   if (likeCheckbox) likeCheckbox.checked = false;
 

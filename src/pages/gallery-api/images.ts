@@ -13,8 +13,9 @@ export const GET: APIRoute = async () => {
   try {
     const { data, error } = await supabase
       .from('gallery_likes')
-      .select('id, img_url, count')
-      .order('id', { ascending: true });
+      .select('id, display_index, img_url, count')
+      .eq('active_flag', true)
+      .order('display_index', { ascending: true });
 
     if (error) {
       return new Response(JSON.stringify({ error: error.message }), { status: 500 });
