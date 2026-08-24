@@ -4,14 +4,32 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout title="Home">
   <div class="home-container">
-    <!-- 这里是暂时的空白页面，之后可以在这里放别的内容 -->
+    <div class="home-item">
+      <p>blank index page for jisichong</p>
+    </div>
   </div>
 </Layout>
 
 <style>
+  .home-item {
+    border: 2px solid rgb(183, 189, 232);
+    border-radius: 0.5em;
+    padding: 20px;
+    width: 10em;
+  }
+  
   .home-container {
-    width: 100vw;
-    height: 100vh;
-    background-color: #000; /* 或你希望的背景色 */
+    border: 2px solid rgb(224, 197, 219);
+    border-radius: 0.5em;
+    font: 1.2em sans-serif;
+
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  p {
+    color: rgb(238, 247, 117);
   }
 </style>
