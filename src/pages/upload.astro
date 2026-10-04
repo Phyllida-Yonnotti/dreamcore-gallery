@@ -4,12 +4,6 @@ import AdminLayout from "../layouts/AdminLayout.astro";
 import "../styles/admin-custom.css";
 
 export const prerender = false;
-
-// 登录校验保持不动
-/*const token = Astro.cookies.get('admin_token')?.value;
-if (!token) {
-  return Astro.redirect('/login');
-}*/
 ---
 
 <AdminLayout title="批量上传图片页面">
@@ -24,7 +18,7 @@ if (!token) {
           <input
             type="file"
             id="img-file"
-            accept="image/*"
+            accept="image/*,.heic,.HEIC"
             multiple
             class="file-input"
           />
@@ -36,7 +30,11 @@ if (!token) {
       </div>
 
       <!-- 待上传的文件预览与重命名列表容器 -->
-      <div id="file-list-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"></div>
+      <div
+        id="file-list-container"
+        style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"
+      >
+      </div>
 
       <button
         id="upload-btn"
@@ -56,6 +54,9 @@ if (!token) {
   </main>
 
   <script>
+    // 引入支持最新 iOS HEIC/HDR 格式的 heic-to 库
+    import { heicTo } from "heic-to";
+
     interface UploadItem {
       id: string;
       file: File;
@@ -73,7 +74,6 @@ if (!token) {
 
     const validFileNameRegex = /^[a-zA-Z0-9_-]+$/;
 
-    // 预留压缩算法逻辑保持一致
     function compressImage(
       file: File,
       maxWidth = 1920,
@@ -125,20 +125,77 @@ if (!token) {
       });
     }
 
+    // 将 HEIC 文件转换为 standard JPEG File (基于 heic-to)
+    async function convertHeicToJpeg(file: File): Promise<File> {
+      if (statusEl) {
+        statusEl.textContent = `正在将苹果 HEIC 格式图片 [${file.name}] 转码为 JPEG...`;
+        statusEl.style.color = "#214491";
+      }
+
+      try {
+        const convertedBlob = await heicTo({
+          blob: file,
+          type: "image/jpeg",
+          quality: 0.85,
+        });
+
+        const newName = file.name.replace(/\.(heic|HEIC)$/i, ".jpg");
+
+        return new File([convertedBlob], newName, {
+          type: "image/jpeg",
+          lastModified: Date.now(),
+        });
+      } catch (err: any) {
+        console.error("HEIC 详细转换错误信息:", err);
+        throw new Error(`HEIC 转码失败 (${file.name}): ${err?.message || "格式无法解析"}`);
+      }
+    }
+
+    // 点击 Dropzone 打开文件选择框
+    if (dropzone && imgFileInput) {
+      dropzone.addEventListener("click", (e) => {
+        if (e.target !== imgFileInput) {
+          imgFileInput.click();
+        }
+      });
+    }
+
     // 处理加入的新文件
-    function handleAddedFiles(files: FileList | File[]) {
-      Array.from(files).forEach((file) => {
-        if (!file.type.startsWith("image/")) return;
-        
-        const lastDotIndex = file.name.lastIndexOf(".");
-        const baseName = lastDotIndex !== -1 ? file.name.substring(0, lastDotIndex) : file.name;
+    async function handleAddedFiles(files: FileList | File[]) {
+      const fileArray = Array.from(files);
+
+      for (const file of fileArray) {
+        let processFile = file;
+
+        // 判断是否为 HEIC / HEIF 格式
+        const isHeic =
+          file.type === "image/heic" ||
+          file.type === "image/heif" ||
+          /\.(heic|HEIC)$/i.test(file.name);
+
+        if (isHeic) {
+          try {
+            processFile = await convertHeicToJpeg(file);
+          } catch (e: any) {
+            alert(e.message);
+            continue;
+          }
+        } else if (!processFile.type.startsWith("image/")) {
+          continue;
+        }
+
+        const lastDotIndex = processFile.name.lastIndexOf(".");
+        const baseName =
+          lastDotIndex !== -1
+            ? processFile.name.substring(0, lastDotIndex)
+            : processFile.name;
 
         uploadQueue.push({
           id: Math.random().toString(36).substring(2, 9),
-          file,
-          customName: baseName
+          file: processFile,
+          customName: baseName,
         });
-      });
+      }
 
       renderFileList();
     }
@@ -187,7 +244,6 @@ if (!token) {
         fileListContainer.appendChild(card);
       });
 
-      // 绑定重命名 Input 事件
       document.querySelectorAll(".item-name-input").forEach((input) => {
         input.addEventListener("input", (e) => {
           const target = e.target as HTMLInputElement;
@@ -198,7 +254,6 @@ if (!token) {
         });
       });
 
-      // 绑定删除单张事件
       document.querySelectorAll(".remove-item-btn").forEach((btn) => {
         btn.addEventListener("click", (e) => {
           const target = e.target as HTMLButtonElement;
@@ -208,24 +263,22 @@ if (!token) {
         });
       });
 
-      // 更新按钮与提示文字
       if (uploadBtn) uploadBtn.disabled = uploadQueue.length === 0;
       if (fileHint) {
-        fileHint.textContent = uploadQueue.length > 0
-          ? `已成功添加 ${uploadQueue.length} 张图片，可继续追加或调整名称`
-          : "点击选择图片，或将图片拖拽至此";
+        fileHint.textContent =
+          uploadQueue.length > 0
+            ? `已成功添加 ${uploadQueue.length} 张图片，可继续追加或调整名称`
+            : "点击选择图片，或将图片拖拽至此";
       }
     }
 
-    // 监听 File Input 选图
     imgFileInput?.addEventListener("change", () => {
       if (imgFileInput.files && imgFileInput.files.length > 0) {
         handleAddedFiles(imgFileInput.files);
-        imgFileInput.value = ""; // 重置 input 允许选择重复文件
+        imgFileInput.value = "";
       }
     });
 
-    // 监听拖拽放置图片
     if (dropzone) {
       ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
         dropzone.addEventListener(eventName, (e) => {
@@ -242,11 +295,9 @@ if (!token) {
       });
     }
 
-    // 点击批量上传
     uploadBtn?.addEventListener("click", async () => {
       if (uploadQueue.length === 0) return alert("请先添加图片");
 
-      // 格式校验
       for (let i = 0; i < uploadQueue.length; i++) {
         const item = uploadQueue[i];
         if (!item.customName) {
@@ -255,7 +306,7 @@ if (!token) {
         }
         if (!validFileNameRegex.test(item.customName)) {
           alert(
-            `第 ${i + 1} 张图片文件名 [${item.customName}] 格式不合法！\n只能包含英文字母、数字、半角横杠(-) 和下划线(_)。`
+            `第 ${i + 1} 张图片文件名 [${item.customName}] 格式不合法！\n只能包含英文字母、数字、半角横杠(-) 和下划线(_)。`,
           );
           return;
         }
@@ -273,9 +324,11 @@ if (!token) {
             statusEl.style.color = "#214491";
           }
 
-          // 压缩图片
           let uploadFile = item.file;
-          if (item.file.size > 1.5 * 1024 * 1024 || item.file.type.startsWith("image/")) {
+          if (
+            item.file.size > 1.5 * 1024 * 1024 ||
+            item.file.type.startsWith("image/")
+          ) {
             uploadFile = await compressImage(item.file, 2048, 2048, 0.82);
           }
 
@@ -283,7 +336,6 @@ if (!token) {
           formData.append("file", uploadFile);
           formData.append("name", item.customName);
 
-          // 请求原本的上传 API (/gallery-api/upload)
           const res = await fetch("/gallery-api/upload", {
             method: "POST",
             body: formData,
@@ -291,7 +343,9 @@ if (!token) {
 
           if (!res.ok) {
             const resText = await res.text();
-            throw new Error(`[图片 ${item.customName}] 上传失败: ${resText || res.statusText}`);
+            throw new Error(
+              `[图片 ${item.customName}] 上传失败: ${resText || res.statusText}`,
+            );
           }
 
           successCount++;
@@ -302,10 +356,8 @@ if (!token) {
           statusEl.style.color = "#4ea851";
         }
 
-        // 清空列表
         uploadQueue = [];
         renderFileList();
-
       } catch (err: any) {
         if (statusEl) {
           statusEl.textContent = `上传中断: ${err.message}`;
