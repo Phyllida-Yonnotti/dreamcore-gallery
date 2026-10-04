@@ -5,52 +5,44 @@ import "../styles/admin-custom.css";
 
 export const prerender = false;
 
-// 登录
+// 登录校验保持不动
 /*const token = Astro.cookies.get('admin_token')?.value;
 if (!token) {
   return Astro.redirect('/login');
 }*/
 ---
 
-<AdminLayout title="上传图片页面">
+<AdminLayout title="批量上传图片页面">
   <main class="admin-page-wrapper">
-    <div class="admin-card">
-      <h2 class="title">上传图像</h2>
+    <div class="admin-card" style="max-width: 650px;">
+      <h2 class="title">批量上传图像</h2>
 
+      <!-- 拖拽与文件选择区域 -->
       <div class="form-group">
-        <label for="img-name" class="field-label"
-          >图片名称 (仅限英数字、中划线、下划线)</label
-        >
-        <input
-          type="text"
-          id="img-name"
-          class="custom-input"
-          placeholder="image0001"
-          autocomplete="off"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label class="field-label">选择图片</label>
-        <div class="dropzone" id="dropzone">
+        <label class="field-label">选择或拖拽图片 (可一次选多张)</label>
+        <div class="dropzone" id="dropzone" style="cursor: pointer;">
           <input
             type="file"
             id="img-file"
             accept="image/*"
+            multiple
             class="file-input"
           />
           <div class="dropzone-content">
             <div class="upload-icon">📸</div>
-            <p id="file-hint">点击选择图片，或将图片拖拽至此</p>
+            <p id="file-hint">点击选择图片，或将多张图片拖拽至此</p>
           </div>
         </div>
       </div>
 
+      <!-- 待上传的文件预览与重命名列表容器 -->
+      <div id="file-list-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;"></div>
+
       <button
         id="upload-btn"
         class="primary-btn"
-        style="width: 100%; padding: 13px; margin-top: 5px;">确认上传</button
+        style="width: 100%; padding: 13px; margin-top: 5px;"
+        disabled>确认批量上传</button
       >
       <div
         id="upload-status"
@@ -64,18 +56,24 @@ if (!token) {
   </main>
 
   <script>
-    const uploadBtn = document.getElementById("upload-btn");
-    const imgFileInput = document.getElementById(
-      "img-file",
-    ) as HTMLInputElement;
-    const imgNameInput = document.getElementById(
-      "img-name",
-    ) as HTMLInputElement;
+    interface UploadItem {
+      id: string;
+      file: File;
+      customName: string;
+    }
+
+    let uploadQueue: UploadItem[] = [];
+
+    const uploadBtn = document.getElementById("upload-btn") as HTMLButtonElement;
+    const imgFileInput = document.getElementById("img-file") as HTMLInputElement;
+    const dropzone = document.getElementById("dropzone");
+    const fileListContainer = document.getElementById("file-list-container");
     const statusEl = document.getElementById("upload-status");
     const fileHint = document.getElementById("file-hint");
 
     const validFileNameRegex = /^[a-zA-Z0-9_-]+$/;
 
+    // 预留压缩算法逻辑保持一致
     function compressImage(
       file: File,
       maxWidth = 1920,
@@ -127,77 +125,194 @@ if (!token) {
       });
     }
 
-    imgFileInput?.addEventListener("change", () => {
-      const file = imgFileInput.files?.[0];
-      if (file) {
+    // 处理加入的新文件
+    function handleAddedFiles(files: FileList | File[]) {
+      Array.from(files).forEach((file) => {
+        if (!file.type.startsWith("image/")) return;
+        
         const lastDotIndex = file.name.lastIndexOf(".");
-        const baseName =
-          lastDotIndex !== -1
-            ? file.name.substring(0, lastDotIndex)
-            : file.name;
-        if (imgNameInput) imgNameInput.value = baseName;
-        if (fileHint) {
-          fileHint.textContent = `已选择: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-          fileHint.style.color = "#214491";
-        }
+        const baseName = lastDotIndex !== -1 ? file.name.substring(0, lastDotIndex) : file.name;
+
+        uploadQueue.push({
+          id: Math.random().toString(36).substring(2, 9),
+          file,
+          customName: baseName
+        });
+      });
+
+      renderFileList();
+    }
+
+    // 渲染待上传预览列表
+    function renderFileList() {
+      if (!fileListContainer) return;
+      fileListContainer.innerHTML = "";
+
+      uploadQueue.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.style.cssText = `
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 12px;
+          background: rgba(0, 0, 0, 0.03);
+          border: 1px solid rgba(0,0,0,0.08);
+          border-radius: 8px;
+        `;
+
+        const imgUrl = URL.createObjectURL(item.file);
+        const sizeMb = (item.file.size / 1024 / 1024).toFixed(2);
+
+        card.innerHTML = `
+          <img src="${imgUrl}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px;" />
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+            <input 
+              type="text" 
+              class="custom-input item-name-input" 
+              value="${item.customName}" 
+              data-index="${index}"
+              placeholder="请输入图片名称"
+              style="padding: 6px 10px; font-size: 0.85rem;"
+            />
+            <span style="font-size: 0.75rem; color: #666;">大小: ${sizeMb} MB</span>
+          </div>
+          <button 
+            type="button" 
+            class="remove-item-btn" 
+            data-index="${index}"
+            style="background: none; border: none; color: #e55353; cursor: pointer; font-size: 0.85rem; padding: 4px 8px;"
+          >删除</button>
+        `;
+
+        fileListContainer.appendChild(card);
+      });
+
+      // 绑定重命名 Input 事件
+      document.querySelectorAll(".item-name-input").forEach((input) => {
+        input.addEventListener("input", (e) => {
+          const target = e.target as HTMLInputElement;
+          const idx = parseInt(target.dataset.index!);
+          if (uploadQueue[idx]) {
+            uploadQueue[idx].customName = target.value.trim();
+          }
+        });
+      });
+
+      // 绑定删除单张事件
+      document.querySelectorAll(".remove-item-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const target = e.target as HTMLButtonElement;
+          const idx = parseInt(target.dataset.index!);
+          uploadQueue.splice(idx, 1);
+          renderFileList();
+        });
+      });
+
+      // 更新按钮与提示文字
+      if (uploadBtn) uploadBtn.disabled = uploadQueue.length === 0;
+      if (fileHint) {
+        fileHint.textContent = uploadQueue.length > 0
+          ? `已成功添加 ${uploadQueue.length} 张图片，可继续追加或调整名称`
+          : "点击选择图片，或将图片拖拽至此";
+      }
+    }
+
+    // 监听 File Input 选图
+    imgFileInput?.addEventListener("change", () => {
+      if (imgFileInput.files && imgFileInput.files.length > 0) {
+        handleAddedFiles(imgFileInput.files);
+        imgFileInput.value = ""; // 重置 input 允许选择重复文件
       }
     });
 
-    uploadBtn?.addEventListener("click", async () => {
-      const file = imgFileInput.files?.[0];
-      const name = imgNameInput.value.trim();
+    // 监听拖拽放置图片
+    if (dropzone) {
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      });
 
-      if (!file) return alert("请选择要上传的图片");
-      if (!name) return alert("请输入图片名称");
-      if (!validFileNameRegex.test(name)) {
-        alert(
-          "文件名格式不合法！\n只能包含英文字母、数字、半角横杠(-) 和下划线(_)。",
-        );
-        return imgNameInput.focus();
+      dropzone.addEventListener("drop", (e: DragEvent) => {
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) {
+          handleAddedFiles(files);
+        }
+      });
+    }
+
+    // 点击批量上传
+    uploadBtn?.addEventListener("click", async () => {
+      if (uploadQueue.length === 0) return alert("请先添加图片");
+
+      // 格式校验
+      for (let i = 0; i < uploadQueue.length; i++) {
+        const item = uploadQueue[i];
+        if (!item.customName) {
+          alert(`第 ${i + 1} 张图片名称不能为空！`);
+          return;
+        }
+        if (!validFileNameRegex.test(item.customName)) {
+          alert(
+            `第 ${i + 1} 张图片文件名 [${item.customName}] 格式不合法！\n只能包含英文字母、数字、半角横杠(-) 和下划线(_)。`
+          );
+          return;
+        }
       }
 
+      uploadBtn.disabled = true;
+
       try {
-        if (statusEl) {
-          statusEl.textContent = "正在自动优化并压缩图片...";
-          statusEl.style.color = "#214491";
+        let successCount = 0;
+
+        for (let i = 0; i < uploadQueue.length; i++) {
+          const item = uploadQueue[i];
+          if (statusEl) {
+            statusEl.textContent = `正在优化与上传第 (${i + 1}/${uploadQueue.length}) 张: ${item.customName}...`;
+            statusEl.style.color = "#214491";
+          }
+
+          // 压缩图片
+          let uploadFile = item.file;
+          if (item.file.size > 1.5 * 1024 * 1024 || item.file.type.startsWith("image/")) {
+            uploadFile = await compressImage(item.file, 2048, 2048, 0.82);
+          }
+
+          const formData = new FormData();
+          formData.append("file", uploadFile);
+          formData.append("name", item.customName);
+
+          // 请求原本的上传 API (/gallery-api/upload)
+          const res = await fetch("/gallery-api/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            const resText = await res.text();
+            throw new Error(`[图片 ${item.customName}] 上传失败: ${resText || res.statusText}`);
+          }
+
+          successCount++;
         }
 
-        let uploadFile = file;
-        if (file.size > 1.5 * 1024 * 1024 || file.type.startsWith("image/")) {
-          uploadFile = await compressImage(file, 2048, 2048, 0.82);
-        }
-
-        if (statusEl)
-          statusEl.textContent = `正在上传中 (${(uploadFile.size / 1024).toFixed(0)} KB)...`;
-
-        const formData = new FormData();
-        formData.append("file", uploadFile);
-        formData.append("name", name);
-
-        const res = await fetch("/gallery-api/upload", {
-          method: "POST",
-          body: formData,
-        });
-        const resText = await res.text();
-
-        if (!res.ok)
-          throw new Error(`[HTTP ${res.status}] ${resText || res.statusText}`);
-
         if (statusEl) {
-          statusEl.textContent = "上传成功！";
+          statusEl.textContent = `🎉 全部完成！成功上传 ${successCount} 张图片。`;
           statusEl.style.color = "#4ea851";
         }
-        imgNameInput.value = "";
-        imgFileInput.value = "";
-        if (fileHint) {
-          fileHint.textContent = "点击选择图片，或将图片拖拽至此";
-          fileHint.style.color = "rgba(91, 98, 103, 0.7)";
-        }
+
+        // 清空列表
+        uploadQueue = [];
+        renderFileList();
+
       } catch (err: any) {
         if (statusEl) {
-          statusEl.textContent = `上传失败: ${err.message}`;
+          statusEl.textContent = `上传中断: ${err.message}`;
           statusEl.style.color = "#e55353";
         }
+      } finally {
+        uploadBtn.disabled = uploadQueue.length === 0;
       }
     });
   </script>
