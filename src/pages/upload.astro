@@ -65,8 +65,12 @@ export const prerender = false;
 
     let uploadQueue: UploadItem[] = [];
 
-    const uploadBtn = document.getElementById("upload-btn") as HTMLButtonElement;
-    const imgFileInput = document.getElementById("img-file") as HTMLInputElement;
+    const uploadBtn = document.getElementById(
+      "upload-btn",
+    ) as HTMLButtonElement;
+    const imgFileInput = document.getElementById(
+      "img-file",
+    ) as HTMLInputElement;
     const dropzone = document.getElementById("dropzone");
     const fileListContainer = document.getElementById("file-list-container");
     const statusEl = document.getElementById("upload-status");
@@ -76,52 +80,58 @@ export const prerender = false;
 
     function compressImage(
       file: File,
-      maxWidth = 1920,
-      maxHeight = 1920,
-      quality = 0.85,
+      maxWidth = 2048,
+      maxHeight = 2048,
+      quality = 0.82,
     ): Promise<File> {
       return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (e) => {
-          const img = new Image();
-          img.src = e.target?.result as string;
-          img.onload = () => {
-            let { width, height } = img;
-            if (width > maxWidth || height > maxHeight) {
-              if (width / height > maxWidth / maxHeight) {
-                height = Math.round((height * maxWidth) / width);
-                width = maxWidth;
-              } else {
-                width = Math.round((width * maxHeight) / height);
-                height = maxHeight;
-              }
-            }
-            const canvas = document.createElement("canvas");
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext("2d");
-            if (!ctx) return reject(new Error("Canvas 初始化失败"));
-            ctx.drawImage(img, 0, 0, width, height);
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.src = objectUrl;
 
-            const mimeType = file.type || "image/jpeg";
-            canvas.toBlob(
-              (blob) => {
-                if (!blob) return reject(new Error("图片压缩失败"));
-                resolve(
-                  new File([blob], file.name, {
-                    type: mimeType,
-                    lastModified: Date.now(),
-                  }),
-                );
-              },
-              mimeType,
-              quality,
-            );
-          };
-          img.onerror = (err) => reject(err);
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl); // 及时释放内存
+          let { width, height } = img;
+
+          if (width > maxWidth || height > maxHeight) {
+            if (width / height > maxWidth / maxHeight) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+
+          if (!ctx) return reject(new Error("Canvas 初始化失败"));
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // 确保 mimeType 始终为 image/jpeg
+          const mimeType = "image/jpeg";
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) return reject(new Error("图片 Canvas 导出 Blob 失败"));
+              resolve(
+                new File([blob], file.name, {
+                  type: mimeType,
+                  lastModified: Date.now(),
+                }),
+              );
+            },
+            mimeType,
+            quality,
+          );
         };
-        reader.onerror = (err) => reject(err);
+
+        img.onerror = (err) => {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error("图片资源加载失败，请检查文件是否损坏"));
+        };
       });
     }
 
@@ -147,7 +157,9 @@ export const prerender = false;
         });
       } catch (err: any) {
         console.error("HEIC 详细转换错误信息:", err);
-        throw new Error(`HEIC 转码失败 (${file.name}): ${err?.message || "格式无法解析"}`);
+        throw new Error(
+          `HEIC 转码失败 (${file.name}): ${err?.message || "格式无法解析"}`,
+        );
       }
     }
 
@@ -359,12 +371,15 @@ export const prerender = false;
         uploadQueue = [];
         renderFileList();
       } catch (err: any) {
+        console.error("上传错误详情:", err);
         if (statusEl) {
-          statusEl.textContent = `上传中断: ${err.message}`;
+          // 处理各种报错格式
+          const errorMessage =
+            err?.message ||
+            (typeof err === "string" ? err : JSON.stringify(err));
+          statusEl.textContent = `上传中断: ${errorMessage}`;
           statusEl.style.color = "#e55353";
         }
-      } finally {
-        uploadBtn.disabled = uploadQueue.length === 0;
       }
     });
   </script>
